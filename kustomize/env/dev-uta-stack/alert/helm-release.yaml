@@ -30,8 +30,6 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_SYNCHRONIZE: "false"
         TYPEORM_MIGRATIONS: "true"
-        POSTGRES_USER: pg-uta-alert@dev-uta-ng-stack.iam
-        POSTGRES_DATABASE: uta_alert
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/alert" # {"$imagepolicy": "apps:alert-image-policy:name"}
         tag: "latest" # {"$imagepolicy": "apps:alert-image-policy:tag"}
@@ -43,12 +41,9 @@ spec:
           cpu: "500m"
           memory: "2Gi"
       cloudsql:
-        enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+        enabled: false
       workloadIdentityMapping:
-        enabled: true
-        project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-alert"
+        enabled: false
     virtualServicesHttp:
       - name: docs
         enabled: true

@@ -13,7 +13,7 @@ spec:
       labels:
         app: uta-address-book-pg
     spec:
-      serviceAccountName: uta-address-book
+      serviceAccountName: address-book
       containers:
         - name: psql
           image: postgres
