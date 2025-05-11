@@ -20,7 +20,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 1
+      replicaCount: 0
       strategy:
         type: Recreate
       image:
