@@ -1,0 +1,10 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-optimism
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-optimism
+        INSTANCE_CHAINS: OPTIMISM

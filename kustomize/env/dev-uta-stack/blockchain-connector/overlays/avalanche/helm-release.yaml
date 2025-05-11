@@ -1,0 +1,10 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-avalanche
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-avalanche
+        INSTANCE_CHAINS: AVALANCHE

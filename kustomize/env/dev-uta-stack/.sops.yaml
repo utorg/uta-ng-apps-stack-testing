@@ -1,0 +1,4 @@
+creation_rules:
+  - path_regex: .*.yaml
+    encrypted_regex: ^(data|stringData)$
+    gcp_kms: projects/dev-uta-ng-stack/locations/global/keyRings/dev-uta-ng-stack-sops/cryptoKeys/dev-uta-ng-stack-sops-default

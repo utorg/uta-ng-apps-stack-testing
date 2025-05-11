@@ -1,0 +1,11 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-linea
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-linea
+        INSTANCE_CHAINS: LINEA
+

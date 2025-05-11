@@ -1,0 +1,69 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: documentation
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.18.1"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 0
+      strategy:
+        type: Recreate
+      image:
+        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/documentation" # {"$imagepolicy": "apps:documentation-image-policy:name"}
+        tag: "latest" # {"$imagepolicy": "apps:documentation-image-policy:tag"}
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "2Gi"
+      containerPort: 3000
+      cloudsql:
+        enabled: false
+      workloadIdentityMapping:
+        enabled: false
+      env:
+        APPLICATION_NAME: documentation
+        HTTP_PORT: "3000"
+        DOCUMENTS: |
+          {
+            "address-book": "https://admin-dev.utorg.com/api/address-book/api-docs/json",
+            "api": "https://app-dev.utorg.com/api/api-docs/json",
+            "backoffice": "https://admin-dev.utorg.com/api/backoffice/api-docs/json",
+            "balance-manager": "https://admin-dev.utorg.com/api/balance-manager/api-docs/json",
+            "blockchain-connector": "https://admin-dev.utorg.com/api/blockchain-connector/api-docs/json",
+            "blockchain-info": "https://admin-dev.utorg.com/api/blockchain-info/api-docs/json",
+            "blockchain-watcher": "https://admin-dev.utorg.com/api/blockchain-watcher/api-docs/json",
+            "currency-service": "https://admin-dev.utorg.com/api/currency-service/api-docs/json",
+            "dead-letter": "https://admin-dev.utorg.com/api/dead-letter/api-docs/json",
+            "identity-manager": "https://admin-dev.utorg.com/api/identity-manager/api-docs/json",
+            "notifications": "https://app-dev.utorg.com/notifications/api-docs/json",
+            "ramp-api": "https://app-dev.utorg.com/ramp-api/api-docs/json",
+            "rates": "https://admin-dev.utorg.com/api/rates/api-docs/json",
+            "rates-publisher": "https://admin-dev.utorg.com/api/rates-publisher/api-docs/json",
+            "stat-service": "https://admin-dev.utorg.com/api/stat-service/api-docs/json",
+            "stories": "https://admin-dev.utorg.com/api/stories/api-docs/json",
+            "transactions-history": "https://admin-dev.utorg.com/api/transactions-history/api-docs/json",
+            "wallet-manager": "https://admin-dev.utorg.com/api/wallet-manager/api-docs/json",
+            "fee-service": "https://admin-dev.utorg.com/api/fee-service/api-docs/json",
+            "transaction-sender": "https://admin-dev.utorg.com/api/tx-sender/api-docs/json"
+          }
+    virtualServicesHttp:
+      - enabled: true
+        name: default
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "docs-dev.utorg.com"
+        prefix: "/"

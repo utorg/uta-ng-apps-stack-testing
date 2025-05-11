@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-bsc
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-bsc
+        INSTANCE_CHAINS: BSC
+        NODE_OPTIONS: "--max-old-space-size=6400"
+      resources:
+        limits:
+          cpu: "2"
+          memory: "8Gi"

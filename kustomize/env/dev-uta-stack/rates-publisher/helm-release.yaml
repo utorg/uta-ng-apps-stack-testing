@@ -1,0 +1,63 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rates-publisher
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.18.1"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 0
+      strategy:
+        type: Recreate
+      image:
+        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/rates-publisher" # {"$imagepolicy": "apps:rates-publisher-image-policy:name"}
+        tag: "latest" # {"$imagepolicy": "apps:rates-publisher-image-policy:tag"}
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "2Gi"
+      containerPort: 3000
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-rates-publisher"
+      env:
+        APPLICATION_NAME: rates-publisher
+        HTTP_URL: https://admin-dev.utorg.com/api/rates-publisher
+        POSTGRES_DATABASE: uta_rates_publisher
+        POSTGRES_USER: pg-uta-rates-publisher@dev-uta-ng-stack.iam
+        NODE_OPTIONS: "--max-old-space-size=1600"
+        TYPEORM_MIGRATIONS: "true"
+        TYPEORM_SYNCHRONIZE: "false"
+        HTTP_DOCS_PATH: api-docs
+    virtualServicesHttp:
+      - enabled: true
+        name: docs
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/api/rates-publisher/api-docs"
+        rewrite:
+          uri: "/api-docs"
+      - enabled: true
+        name: default
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/api/rates-publisher"
+        enablePathRewriteToRoot: true

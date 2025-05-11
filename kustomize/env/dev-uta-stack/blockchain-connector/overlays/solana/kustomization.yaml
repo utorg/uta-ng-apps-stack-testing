@@ -1,0 +1,10 @@
+resources:
+  - ../../base
+
+nameSuffix: -solana
+
+patches:
+  - path: helm-release.yaml
+    target:
+      kind: HelmRelease
+      name: blockchain-connector$

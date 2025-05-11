@@ -1,0 +1,68 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: transactions-history
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.18.1"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 0
+      strategy:
+        type: Recreate
+      image:
+        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/transactions-history" # {"$imagepolicy": "apps:transactions-history-image-policy:name"}
+        tag: "latest" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "2Gi"
+      containerPort: 3000
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-transactions-history"
+      env:
+        APPLICATION_NAME: transactions-history
+        APPLICATION_VERSION: "0.0.0" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
+        HTTP_URL: https://admin-dev.utorg.com/api/transactions-history
+        POSTGRES_DATABASE: uta_transactions_history
+        POSTGRES_USER: pg-uta-transactions-history@dev-uta-ng-stack.iam
+        NODE_OPTIONS: "--max-old-space-size=512"
+        TYPEORM_MIGRATIONS: "true"
+        TYPEORM_SYNCHRONIZE: "false"
+        HTTP_DOCS_PATH: api-docs
+        PROFILER_ENABLED: "false"
+        PROFILER_GCLOUD_PROJECT: zerohub-core-0
+        PROFILER_GCLOUD_ZONE: europe-west4-a
+        LOG_LEVEL: debug
+    virtualServicesHttp:
+      - enabled: true
+        name: docs
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/api/transactions-history/api-docs"
+        rewrite:
+          uri: "/api-docs"
+      - enabled: true
+        name: default
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/api/transactions-history"
+        enablePathRewriteToRoot: true

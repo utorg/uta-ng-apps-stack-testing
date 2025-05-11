@@ -1,0 +1,10 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-arbitrum
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-arbitrum
+        INSTANCE_CHAINS: ARBITRUM

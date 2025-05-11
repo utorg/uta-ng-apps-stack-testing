@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-watcher-solana
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-solana
+        INSTANCE_CHAINS: SOLANA
+        NODE_OPTIONS: "--max-old-space-size=4800"
+      resources:
+        limits:
+          cpu: "3"
+          memory: "6Gi"

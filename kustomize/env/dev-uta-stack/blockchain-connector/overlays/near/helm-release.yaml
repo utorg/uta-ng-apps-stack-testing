@@ -1,0 +1,11 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-near
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-near
+        INSTANCE_CHAINS: NEAR
+

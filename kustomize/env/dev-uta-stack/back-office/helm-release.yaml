@@ -1,0 +1,63 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: back-office
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.18.1"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 0
+      containerPort: 3000
+      env:
+        APPLICATION_NAME: back-office
+        HTTP_URL: https://admin-dev.utorg.com/api/backoffice
+        HTTP_DOCS_PATH: api-docs
+        NODE_OPTIONS: "--max-old-space-size=1600"
+        TYPEORM_SYNCHRONIZE: "false"
+        POSTGRES_USER: pg-uta-back-office@dev-uta-ng-stack.iam
+        POSTGRES_DATABASE: uta_back_office
+      image:
+        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/back-office" # {"$imagepolicy": "apps:back-office-image-policy:name"}
+        tag: "latest" # {"$imagepolicy": "apps:back-office-image-policy:tag"}
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "1Gi"
+        limits:
+          cpu: "500m"
+          memory: "2Gi"
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-back-office"
+    virtualServicesHttp:
+      - name: docs
+        enabled: true
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/api/backoffice/api-docs"
+        rewrite:
+          uri: "/api-docs/"
+      - name: default
+        enabled: true
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/api/backoffice"
+        enablePathRewriteToRoot: true

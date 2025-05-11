@@ -1,0 +1,65 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alert
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.18.1"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+        - "alert-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 0
+      containerPort: 3000
+      env:
+        APPLICATION_NAME: alert
+        HTTP_URL: https://admin-dev.utorg.com/api/alert
+        HTTP_DOCS_PATH: api-docs
+        NODE_OPTIONS: "--max-old-space-size=1600"
+        TYPEORM_SYNCHRONIZE: "false"
+        TYPEORM_MIGRATIONS: "true"
+        POSTGRES_USER: pg-uta-alert@dev-uta-ng-stack.iam
+        POSTGRES_DATABASE: uta_alert
+      image:
+        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/alert" # {"$imagepolicy": "apps:alert-image-policy:name"}
+        tag: "latest" # {"$imagepolicy": "apps:alert-image-policy:tag"}
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "600Mi"
+        limits:
+          cpu: "500m"
+          memory: "2Gi"
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-alert"
+    virtualServicesHttp:
+      - name: docs
+        enabled: true
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/api/alert/api-docs"
+        rewrite:
+          uri: "/api-docs/"
+      - name: default
+        enabled: true
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/api/alert"
+        enablePathRewriteToRoot: true
