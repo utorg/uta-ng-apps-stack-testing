@@ -47,7 +47,7 @@ spec:
       workloadIdentityMapping:
         enabled: true
         project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-address-book"
+        serviceAccountName: "pg-uta-address-book"
     virtualServicesHttp:
       - name: docs
         enabled: true

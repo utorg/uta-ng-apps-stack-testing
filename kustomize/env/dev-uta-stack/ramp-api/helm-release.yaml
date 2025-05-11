@@ -36,9 +36,9 @@ spec:
         enabled: true
         connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
-        enabled: true
+        enabled: false
         project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-api"
+#        serviceAccountName: "pg-uta-api"
       env:
         APPLICATION_NAME: ramp-api
         HTTP_URL: https://app-dev.utorg.com/ramp-api
