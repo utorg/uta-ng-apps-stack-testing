@@ -32,7 +32,7 @@ spec:
         TYPEORM_MIGRATIONS: "true"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/alert" # {"$imagepolicy": "apps:alert-image-policy:name"}
-        tag: "latest" # {"$imagepolicy": "apps:alert-image-policy:tag"}
+        tag: "2.52.0-124-ga05b701c" # {"$imagepolicy": "apps:alert-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"

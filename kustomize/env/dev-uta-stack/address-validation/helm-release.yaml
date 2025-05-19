@@ -30,7 +30,7 @@ spec:
         TYPEORM_SYNCHRONIZE: "false"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/address-validation" # {"$imagepolicy": "apps:address-validation-image-policy:name"}
-        tag: "latest" # {"$imagepolicy": "apps:address-validation-image-policy:tag"}
+        tag: "2.52.0-124-ga05b701c" # {"$imagepolicy": "apps:address-validation-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
