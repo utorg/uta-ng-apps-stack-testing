@@ -33,7 +33,7 @@ spec:
         POSTGRES_DATABASE: uta_api
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/api" # {"$imagepolicy": "apps:api-image-policy:name"}
-        tag: "latest" # {"$imagepolicy": "apps:api-image-policy:tag"}
+        tag: "2.52.0-124-ga05b701c" # {"$imagepolicy": "apps:api-image-policy:tag"}
       resources:
         requests:
           cpu: "100m"

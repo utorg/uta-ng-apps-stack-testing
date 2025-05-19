@@ -23,7 +23,7 @@ spec:
       replicaCount: 0
       containerPort: 3000
       env:
-        APPLICATION_VERSION: "latest" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
+        APPLICATION_VERSION: "2.52.0-124-ga05b701c" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
         HTTP_ADDRESS: https://admin.utorg.com/api/blockchain-info
         POSTGRES_USER: pg-uta-blockchain-info@dev-uta-ng-stack.iam
         POSTGRES_DATABASE: uta_blockchain_info
@@ -36,7 +36,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=3200"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-info" # {"$imagepolicy": "apps:blockchain-info-image-policy:name"}
-        tag: "latest" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
+        tag: "2.52.0-124-ga05b701c" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
       strategy:
         type: Recreate
       resources:
