@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.18.2"
+      version: "1.19.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -16,6 +16,7 @@ spec:
   values:
     global:
       serviceAccount:
+        create: false
         name: "blockchain-watcher"
       envConfigMapNames:
         - common-env-cm

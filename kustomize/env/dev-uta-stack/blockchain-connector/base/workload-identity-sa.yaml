@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: blockchain-connector
+  namespace: apps
+  annotations:
+    iam.gke.io/gcp-service-account: pg-uta-blockchain-connector@dev-uta-ng-stack.iam.gserviceaccount.com
