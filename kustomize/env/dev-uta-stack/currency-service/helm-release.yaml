@@ -25,7 +25,7 @@ spec:
         type: Recreate
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/currency-service" # {"$imagepolicy": "apps:currency-service-image-policy:name"}
-        tag: "2.52.0-124-ga05b701c" # {"$imagepolicy": "apps:currency-service-image-policy:tag"}
+        tag: "2.52.0-125-gfc6d8af2" # {"$imagepolicy": "apps:currency-service-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
