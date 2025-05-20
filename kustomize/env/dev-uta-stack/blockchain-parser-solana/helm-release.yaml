@@ -20,7 +20,7 @@ spec:
       envSecretNames:
         - common-secret
     deployment:
-      replicaCount: 0 #6
+      replicaCount: 6
       containerPort: 3000
       env:
         APPLICATION_NAME: blockchain-connector-solana
