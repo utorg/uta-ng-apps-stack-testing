@@ -39,6 +39,10 @@ spec:
         limits:
           cpu: "300m"
           memory: "256Mi"
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        runAsGroup: 0
     virtualServicesHttp:
       - name: default
         enabled: true
