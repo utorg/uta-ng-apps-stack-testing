@@ -20,6 +20,8 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
+      startupProbe:
+        enabled: false
       replicaCount: 1
       strategy:
         type: Recreate
