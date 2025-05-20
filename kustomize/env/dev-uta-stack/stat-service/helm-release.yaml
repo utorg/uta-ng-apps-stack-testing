@@ -17,6 +17,7 @@ spec:
     global:
       envSecretNames:
         - "common-secret"
+        - "stat-service-secret"
       envConfigMapNames:
         - "common-env-cm"
     deployment:
