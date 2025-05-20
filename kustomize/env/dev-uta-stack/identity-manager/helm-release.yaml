@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.18.1"
+      version: "1.19.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -21,7 +21,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       strategy:
         type: Recreate
       image:
@@ -32,13 +32,6 @@ spec:
           cpu: "500m"
           memory: "2Gi"
       containerPort: 3000
-      cloudsql:
-        enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
-      workloadIdentityMapping:
-        enabled: true
-        project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-identity-manager"
       env:
         APPLICATION_NAME: identity-manager
         HTTP_URL: https://admin-dev.utorg.com/api/identity-manager
@@ -49,6 +42,13 @@ spec:
         TYPEORM_SYNCHRONIZE: "false"
         HTTP_DOCS_PATH: api-docs
         NATS_TOKEN_SETTINGS_ENABLED: "true"
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-identity-manager"
     virtualServicesHttp:
       - enabled: true
         name: docs

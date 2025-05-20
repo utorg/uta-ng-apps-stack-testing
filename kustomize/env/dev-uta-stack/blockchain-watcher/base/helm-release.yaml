@@ -21,7 +21,7 @@ spec:
         - common-secret
 
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       startupProbe:
         http:
           port: 3100

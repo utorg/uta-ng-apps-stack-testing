@@ -21,7 +21,7 @@ spec:
         - blockchain-connector-secret
         - common-secret
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       containerPort: 3000
       env:
         APPLICATION_VERSION: "latest" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}

@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.18.1"
+      version: "1.19.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -20,7 +20,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       strategy:
         type: Recreate
       image:
@@ -31,13 +31,6 @@ spec:
           cpu: "500m"
           memory: "2Gi"
       containerPort: 3000
-      cloudsql:
-        enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
-      workloadIdentityMapping:
-        enabled: true
-        project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-notifications"
       env:
         APPLICATION_NAME: notifications
         HTTP_URL: https://app-dev.utorg.com/notifications
@@ -50,6 +43,13 @@ spec:
         FIREBASE_CLIENT_EMAIL: "dev-uta-notifications-firebase@zerohub-core-0.iam.gserviceaccount.com"
         FIREBASE_PROJECT_ID: "zerohub-core-0"
         TOKEN_TTL_DAYS: "60"
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-notifications"
     virtualServicesHttp:
       - enabled: true
         name: docs

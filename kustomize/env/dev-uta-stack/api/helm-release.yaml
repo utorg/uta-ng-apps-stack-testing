@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.18.1"
+      version: "1.19.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -20,7 +20,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       containerPort: 3000
       env:
         APPLICATION_NAME: api
@@ -29,8 +29,6 @@ spec:
         NATS_DEBUG: "false"
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_SYNCHRONIZE: "false"
-        POSTGRES_USER: pg-uta-api@dev-uta-ng-stack.iam
-        POSTGRES_DATABASE: uta_api
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/api" # {"$imagepolicy": "apps:api-image-policy:name"}
         tag: "2.52.0-125-gfc6d8af2" # {"$imagepolicy": "apps:api-image-policy:tag"}
@@ -41,13 +39,6 @@ spec:
         limits:
           cpu: "500m"
           memory: "2Gi"
-      cloudsql:
-        enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
-      workloadIdentityMapping:
-        enabled: true
-        project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-api"
     virtualServicesHttp:
       - name: docs
         enabled: true

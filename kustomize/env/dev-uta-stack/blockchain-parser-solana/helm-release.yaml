@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.18.1"
+      version: "1.19.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -25,8 +25,6 @@ spec:
       env:
         APPLICATION_NAME: blockchain-connector-solana
         APPLICATION_VERSION: "2.52.0-125-gfc6d8af2" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:tag"}
-        POSTGRES_USER: pg-uta-blockchain-parser-solana@dev-uta-ng-stack.iam
-        POSTGRES_DATABASE: uta_blockchain_parser
         PROFILER_ENABLED: false
         PROFILER_GCLOUD_PROJECT: zerohub-core-0
         PROFILER_GCLOUD_ZONE: europe-west4-a
