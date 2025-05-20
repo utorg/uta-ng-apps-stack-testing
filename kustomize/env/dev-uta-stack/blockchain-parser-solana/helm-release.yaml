@@ -24,7 +24,7 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: blockchain-connector-solana
-        APPLICATION_VERSION: "2.52.0-124-ga05b701c" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:tag"}
+        APPLICATION_VERSION: "2.52.0-125-gfc6d8af2" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:tag"}
         POSTGRES_USER: pg-uta-blockchain-parser-solana@dev-uta-ng-stack.iam
         POSTGRES_DATABASE: uta_blockchain_parser
         PROFILER_ENABLED: false
@@ -33,7 +33,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=3200"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-parser-solana" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:name"}
-        tag: "2.52.0-124-ga05b701c" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:tag"}
+        tag: "2.52.0-125-gfc6d8af2" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:tag"}
       resources:
         limits:
           cpu: "1"
