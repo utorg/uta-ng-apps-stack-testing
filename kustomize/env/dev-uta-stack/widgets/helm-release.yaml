@@ -20,7 +20,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       strategy:
         type: Recreate
       image:
@@ -31,18 +31,9 @@ spec:
           cpu: "1"
           memory: "2Gi"
       containerPort: 3000
-      cloudsql:
-        enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
-      workloadIdentityMapping:
-        enabled: true
-        project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-widgets"
       env:
         APPLICATION_NAME: widgets
         HTTP_URL: https://admin-dev.utorg.com/api/widgets
-        POSTGRES_DATABASE: uta_widgets
-        POSTGRES_USER: pg-uta-widgets@dev-uta-ng-stack.iam
         REDIS_HOST: redis-master.uta-redis.svc.cluster.local
         REDIS_PORT: "6379"
         NODE_OPTIONS: "--max-old-space-size=1600"

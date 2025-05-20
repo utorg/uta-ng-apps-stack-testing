@@ -21,7 +21,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       strategy:
         type: Recreate
       image:
@@ -32,13 +32,6 @@ spec:
           cpu: "1"
           memory: "2Gi"
       containerPort: 3000
-      cloudsql:
-        enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
-      workloadIdentityMapping:
-        enabled: true
-        project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-stories"
       env:
         APPLICATION_NAME: stories
         HTTP_URL: https://admin-dev.utorg.com/api/stories
@@ -48,6 +41,13 @@ spec:
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
         HTTP_DOCS_PATH: api-docs
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-stories"
     virtualServicesHttp:
       - enabled: true
         name: docs

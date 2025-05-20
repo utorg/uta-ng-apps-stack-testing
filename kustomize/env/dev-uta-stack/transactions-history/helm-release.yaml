@@ -20,7 +20,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       strategy:
         type: Recreate
       image:
@@ -31,13 +31,6 @@ spec:
           cpu: "500m"
           memory: "2Gi"
       containerPort: 3000
-      cloudsql:
-        enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
-      workloadIdentityMapping:
-        enabled: true
-        project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-transactions-history"
       env:
         APPLICATION_NAME: transactions-history
         APPLICATION_VERSION: "2.52.0-125-gfc6d8af2" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
@@ -52,6 +45,13 @@ spec:
         PROFILER_GCLOUD_PROJECT: zerohub-core-0
         PROFILER_GCLOUD_ZONE: europe-west4-a
         LOG_LEVEL: debug
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-transactions-history"
     virtualServicesHttp:
       - enabled: true
         name: docs
