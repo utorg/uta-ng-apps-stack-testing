@@ -45,6 +45,9 @@ spec:
         limits:
           cpu: "1"
           memory: "4Gi"
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
         project: "dev-uta-ng-stack"
