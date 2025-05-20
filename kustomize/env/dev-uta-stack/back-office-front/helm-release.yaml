@@ -14,11 +14,6 @@ spec:
         name: default
       interval: 5m
   values:
-    global:
-      envSecretNames:
-        - "common-secret"
-      envConfigMapNames:
-        - "common-env-cm"
     deployment:
       startupProbe:
         http:
