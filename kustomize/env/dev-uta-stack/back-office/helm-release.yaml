@@ -32,7 +32,7 @@ spec:
         POSTGRES_DATABASE: uta_back_office
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/back-office" # {"$imagepolicy": "apps:back-office-image-policy:name"}
-        tag: "latest" # {"$imagepolicy": "apps:back-office-image-policy:tag"}
+        tag: "2.52.0-125-gfc6d8af2" # {"$imagepolicy": "apps:back-office-image-policy:tag"}
       resources:
         requests:
           cpu: "100m"

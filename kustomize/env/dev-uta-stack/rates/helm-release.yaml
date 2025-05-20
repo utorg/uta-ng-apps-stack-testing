@@ -25,7 +25,7 @@ spec:
         type: Recreate
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/rates" # {"$imagepolicy": "apps:rates-image-policy:name"}
-        tag: "latest" # {"$imagepolicy": "apps:rates-image-policy:tag"}
+        tag: "2.52.0-125-gfc6d8af2" # {"$imagepolicy": "apps:rates-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
