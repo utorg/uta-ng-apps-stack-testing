@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: back-office-front
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.19.1"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      startupProbe:
+        http:
+          port: 80
+          path: /
+      replicaCount: 1
+      containerPort: 80
+      env:
+        JAEGER_SERVICE_NAME: "back-office-front.uta"
+        JAEGER_PROPAGATION: "jaeger,b3,w3c"
+      image:
+        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/uta-back-office-front" # {"$imagepolicy": "apps:back-office-front-image-policy:name"}
+        tag: "2.51.0-50-gd097f0a" # {"$imagepolicy": "apps:back-office-front-image-policy:tag"}
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "64Mi"
+        limits:
+          cpu: "300m"
+          memory: "256Mi"
+    virtualServicesHttp:
+      - name: default
+        enabled: true
+        gateway: "istio-ingress/uta-dev-utorg-com"
+        host: "admin-dev.utorg.com"
+        prefix: "/"
