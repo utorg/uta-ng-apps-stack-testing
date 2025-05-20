@@ -43,6 +43,10 @@ spec:
         limits:
           cpu: "1"
           memory: "4Gi"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-blockchain-info"
     virtualServicesHttp:
       - name: docs
         enabled: true
