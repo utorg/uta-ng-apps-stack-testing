@@ -37,12 +37,10 @@ spec:
       workloadIdentityMapping:
         enabled: true
         project: "dev-uta-ng-stack"
-        serviceAccountName: "pg-uta-rates"
+        serviceAccountName: "pg-uta-casbin"
       env:
         APPLICATION_NAME: rates
         HTTP_URL: https://admin-dev.utorg.com/api/rates
-        POSTGRES_DATABASE: uta_rates
-        POSTGRES_USER: pg-uta-rates@dev-uta-ng-stack.iam
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
