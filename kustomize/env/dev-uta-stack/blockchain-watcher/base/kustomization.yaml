@@ -1,5 +1,4 @@
 resources:
-  - workload-identity-sa.yaml
   - helm-release.yaml
 
 #labels:

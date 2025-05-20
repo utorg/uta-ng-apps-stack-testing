@@ -15,9 +15,6 @@ spec:
       interval: 5m
   values:
     global:
-      serviceAccount:
-        create: false
-        name: "blockchain-connector"
       envConfigMapNames:
         - common-env-cm
       envSecretNames:

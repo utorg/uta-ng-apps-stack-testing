@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: blockchain-watcher
-  namespace: apps
-  annotations:
-    iam.gke.io/gcp-service-account: pg-uta-blockchain-watcher@dev-uta-ng-stack.iam.gserviceaccount.com
