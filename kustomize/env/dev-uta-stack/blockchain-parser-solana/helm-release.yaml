@@ -33,6 +33,9 @@ spec:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-parser-solana" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:name"}
         tag: "2.52.0-127-gb04322a2" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:tag"}
       resources:
+        requests:
+          cpu: 10m
+          memory: 128Mi
         limits:
           cpu: "1"
           memory: "4Gi"
