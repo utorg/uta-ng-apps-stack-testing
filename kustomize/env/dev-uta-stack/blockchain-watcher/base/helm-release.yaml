@@ -46,6 +46,13 @@ spec:
         tag: "latest" # {"$imagepolicy": "apps:blockchain-watcher-image-policy:tag"}
       strategy:
         type: Recreate
+      cloudsql:
+        enabled: true
+        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
+      workloadIdentityMapping:
+        enabled: true
+        project: "dev-uta-ng-stack"
+        serviceAccountName: "pg-uta-blockchain-watcher"
       resources:
         limits:
           cpu: "1"
