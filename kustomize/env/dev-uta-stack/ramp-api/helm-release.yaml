@@ -21,7 +21,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 0
+      replicaCount: 1
       strategy:
         type: Recreate
       image:
@@ -36,9 +36,9 @@ spec:
         enabled: true
         connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
-        enabled: false
+        enabled: true
         project: "dev-uta-ng-stack"
-        #        serviceAccountName: "pg-uta-api"
+        serviceAccountName: "pg-uta-casbin"
       env:
         APPLICATION_NAME: ramp-api
         HTTP_URL: https://app-dev.utorg.com/ramp-api
