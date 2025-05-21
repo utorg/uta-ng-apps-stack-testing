@@ -1,7 +1,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: alert
+  name: sse-gateway
   namespace: apps
 spec:
   interval: 1m
