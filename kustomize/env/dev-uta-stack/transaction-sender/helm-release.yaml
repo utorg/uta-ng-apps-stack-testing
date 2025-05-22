@@ -25,7 +25,7 @@ spec:
         type: Recreate
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/transaction-sender" # {"$imagepolicy": "apps:transaction-sender-image-policy:name"}
-        tag: "2.52.0-127-gb04322a2" # {"$imagepolicy": "apps:transaction-sender-image-policy:tag"}
+        tag: "2.52.0-153-g26f1d446" # {"$imagepolicy": "apps:transaction-sender-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
