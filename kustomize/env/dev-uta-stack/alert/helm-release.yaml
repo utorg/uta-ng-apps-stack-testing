@@ -40,10 +40,6 @@ spec:
         limits:
           cpu: "500m"
           memory: "2Gi"
-      cloudsql:
-        enabled: false
-      workloadIdentityMapping:
-        enabled: false
     virtualServicesHttp:
       - name: docs
         enabled: true
