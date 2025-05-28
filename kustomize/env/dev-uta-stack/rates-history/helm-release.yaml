@@ -25,7 +25,7 @@ spec:
         type: Recreate
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/rates-history" # {"$imagepolicy": "apps:rates-history-image-policy:name"}
-        tag: "2.52.0-127-gb04322a2" # {"$imagepolicy": "apps:rates-history-image-policy:tag"}
+        tag: "2.52.0-162-g164c7376" # {"$imagepolicy": "apps:rates-history-image-policy:tag"}
       resources:
         limits:
           cpu: "1"

@@ -33,7 +33,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=1600"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/address-book" # {"$imagepolicy": "apps:address-book-image-policy:name"}
-        tag: "2.52.0-127-gb04322a2" # {"$imagepolicy": "apps:address-book-image-policy:tag"}
+        tag: "2.52.0-162-g164c7376" # {"$imagepolicy": "apps:address-book-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
