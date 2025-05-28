@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: casbin
+  namespace: apps
+  labels:
+    app: uta-casbin-pg
+  annotations:
+    iam.gke.io/gcp-service-account: pg-uta-casbin@dev-uta-ng-stack.iam.gserviceaccount.com
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
+metadata:
+  name: casbin
+  namespace: apps
+  labels:
+    app: uta-casbin-pg
+spec:
+  member: serviceAccount:dev-uta-ng-stack.svc.id.goog[apps/casbin]
+  resourceRef:
+    apiVersion: iam.cnrm.cloud.google.com/v1beta1
+    external: >-
+      projects/dev-uta-ng-stack/serviceAccounts/pg-uta-casbin@dev-uta-ng-stack.iam.gserviceaccount.com
+    kind: IAMServiceAccount
+  role: roles/iam.workloadIdentityUser
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uta-casbin-pg
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uta-casbin-pg
+  template:
+    metadata:
+      labels:
+        app: uta-casbin-pg
+    spec:
+      serviceAccountName: casbin
+      containers:
+        - name: psql
+          image: postgres
+          command: ["sh"]
+          args: ["-c", "tail -f /dev/null"]
+          env:
+            - name: PGPASSWORD
+              value: "1"
+            - name: POSTGRES_USER
+              value: "pg-uta-casbin@dev-uta-ng-stack.iam"
+            - name: POSTGRES_DATABASE
+              value: "uta_casbin"
+            - name: POSTGRES_HOST
+              value: '127.0.0.1'
+            - name: POSTGRES_PORT
+              value: '5000'
+        - name: csql
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
+          args:
+            - >-
+              dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres?auto-iam-authn=true&port=5000&private-ip=true
+          ports:
+            - containerPort: 9801
+              protocol: TCP
+          env:
+            - name: CSQL_PROXY_HTTP_PORT
+              value: '9801'
+            - name: CSQL_PROXY_HTTP_ADDRESS
+              value: 0.0.0.0
+            - name: POSTGRES_HOST
+              value: '127.0.0.1'
+            - name: POSTGRES_PORT
+              value: '5000'
+      restartPolicy: Always
