@@ -7,3 +7,4 @@ spec:
     deployment:
       env:
         APPLICATION_NAME: blockchain-connector-main
+        IS_API_MODULE_ENABLED: true
