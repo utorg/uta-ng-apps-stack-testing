@@ -41,9 +41,6 @@ spec:
         LOG_LEVEL: info
         INSTANCE_CHAINS: ARBITRUM,AURORA,AVALANCHE,BITCOIN,BSC,ETHEREUM,FANTOM,GNOSIS,LINEA,LITECOIN,NEAR,OPTIMISM,POLYGON,TRON,ZKSYNC
         NODE_OPTIONS: "--max-old-space-size=3200"
-      image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-watcher" # {"$imagepolicy": "apps:blockchain-watcher-image-policy:name"}
-        tag: "latest" # {"$imagepolicy": "apps:blockchain-watcher-image-policy:tag"}
       strategy:
         type: Recreate
       cloudsql:
