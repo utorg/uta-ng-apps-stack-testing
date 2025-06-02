@@ -20,7 +20,7 @@ spec:
       envConfigMapNames:
         - "common-env-cm"
     deployment:
-      replicaCount: 1
+      replicaCount: 0
       containerPort: 3000
       env:
         APPLICATION_NAME: address-validation
