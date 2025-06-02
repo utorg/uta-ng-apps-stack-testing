@@ -26,7 +26,7 @@ spec:
         type: Recreate
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/wallet-manager" # {"$imagepolicy": "apps:wallet-manager-image-policy:name"}
-        tag: "2.52.0-163-gbc6038c6" # {"$imagepolicy": "apps:wallet-manager-image-policy:tag"}
+        tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:wallet-manager-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"

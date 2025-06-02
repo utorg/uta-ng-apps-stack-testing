@@ -30,7 +30,7 @@ spec:
         TYPEORM_SYNCHRONIZE: "false"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/back-office" # {"$imagepolicy": "apps:back-office-image-policy:name"}
-        tag: "2.52.0-161-g6c249a51" # {"$imagepolicy": "apps:back-office-image-policy:tag"}
+        tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:back-office-image-policy:tag"}
       resources:
         requests:
           cpu: "100m"
