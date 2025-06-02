@@ -9,6 +9,9 @@ spec:
         APPLICATION_NAME: blockchain-connector-bsc
         INSTANCE_CHAINS: BSC
         NODE_OPTIONS: "--max-old-space-size=6400"
+      image:
+        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-connector" # {"$imagepolicy": "apps:blockchain-connector-bsc-image-policy:name"}
+        tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:blockchain-connector-bsc-image-policy:tag"}
       resources:
         limits:
           cpu: "2"

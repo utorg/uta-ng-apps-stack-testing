@@ -8,4 +8,7 @@ spec:
       env:
         APPLICATION_NAME: blockchain-connector-litecoin
         INSTANCE_CHAINS: LITECOIN
+      image:
+        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-connector" # {"$imagepolicy": "apps:blockchain-connector-litecoin-image-policy:name"}
+        tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:blockchain-connector-litecoin-image-policy:tag"}
 
