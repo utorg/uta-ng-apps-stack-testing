@@ -59,6 +59,7 @@ spec:
             "stat-service": "https://admin-dev.utorg.com/api/stat-service/api-docs/json",
             "stories": "https://admin-dev.utorg.com/api/stories/api-docs/json",
             "transactions-history": "https://admin-dev.utorg.com/api/transactions-history/api-docs/json",
+            "swaps": "https://admin-dev.utorg.com/api/swaps/api-docs/json",
             "wallet-manager": "https://admin-dev.utorg.com/api/wallet-manager/api-docs/json",
             "fee-service": "https://admin-dev.utorg.com/api/fee-service/api-docs/json",
             "transaction-sender": "https://admin-dev.utorg.com/api/tx-sender/api-docs/json"
