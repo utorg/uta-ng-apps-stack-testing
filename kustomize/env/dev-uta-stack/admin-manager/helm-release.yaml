@@ -33,7 +33,7 @@ spec:
         POSTGRES_DATABASE: uta_admin_manager
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/admin-manager" # {"$imagepolicy": "apps:admin-manager-image-policy:name"}
-        tag: "2.52.0-224-gbfb9c79e" # {"$imagepolicy": "apps:admin-manager-image-policy:tag"}
+        tag: "2.52.0-260-g96b5d09e" # {"$imagepolicy": "apps:admin-manager-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
