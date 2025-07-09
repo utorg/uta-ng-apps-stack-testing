@@ -25,7 +25,7 @@ spec:
         type: Recreate
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/transactions-history" # {"$imagepolicy": "apps:transactions-history-image-policy:name"}
-        tag: "2.68.0-4-gc5cfd359" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
+        tag: "2.68.0-10-g9df8550f" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
@@ -33,7 +33,7 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: transactions-history
-        APPLICATION_VERSION: "2.68.0-4-gc5cfd359" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
+        APPLICATION_VERSION: "2.68.0-10-g9df8550f" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
         HTTP_URL: https://admin-dev.utorg.com/api/transactions-history
         POSTGRES_DATABASE: uta_transactions_history
         POSTGRES_USER: pg-uta-transactions-history@dev-uta-ng-stack.iam
