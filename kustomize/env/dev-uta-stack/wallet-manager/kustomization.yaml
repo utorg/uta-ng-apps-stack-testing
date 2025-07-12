@@ -4,3 +4,4 @@ namespace: apps
 resources:
   - app-secret.enc.yaml
   - helm-release.yaml
+  - pod-monitor.yaml
