@@ -31,7 +31,7 @@ spec:
         TYPEORM_SYNCHRONIZE: "false"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/api" # {"$imagepolicy": "apps:api-image-policy:name"}
-        tag: "2.69.0-8-gc8c91bcc" # {"$imagepolicy": "apps:api-image-policy:tag"}
+        tag: "2.70.0-12-g009e7813" # {"$imagepolicy": "apps:api-image-policy:tag"}
       resources:
         requests:
           cpu: "100m"
