@@ -25,7 +25,7 @@ spec:
         type: Recreate
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/fee-service" # {"$imagepolicy": "apps:fee-service-image-policy:name"}
-        tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:fee-service-image-policy:tag"}
+        tag: "2.71.0-27-g3b8d7005" # {"$imagepolicy": "apps:fee-service-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
