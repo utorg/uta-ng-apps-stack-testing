@@ -11,7 +11,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=4800"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-watcher" # {"$imagepolicy": "apps:blockchain-watcher-solana-image-policy:name"}
-        tag: "2.69.0-4-g2792877e" # {"$imagepolicy": "apps:blockchain-watcher-solana-image-policy:tag"}
+        tag: "2.71.0-28-ge7c6b4ab" # {"$imagepolicy": "apps:blockchain-watcher-solana-image-policy:tag"}
       resources:
         limits:
           cpu: "3"
