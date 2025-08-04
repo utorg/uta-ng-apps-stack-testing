@@ -38,7 +38,7 @@ spec:
         HTTP_DOCS_PATH: api-docs
         NATS_DEBUG: "false"
         NODE_ENV: production
-        LOG_LEVEL: info
+        LOG_LEVEL: debug
         INSTANCE_CHAINS: ARBITRUM,AURORA,AVALANCHE,BITCOIN,BSC,ETHEREUM,FANTOM,GNOSIS,LINEA,LITECOIN,NEAR,OPTIMISM,POLYGON,TRON,ZKSYNC
         NODE_OPTIONS: "--max-old-space-size=3200"
       strategy:
