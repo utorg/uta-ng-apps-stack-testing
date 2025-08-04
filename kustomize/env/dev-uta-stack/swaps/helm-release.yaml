@@ -25,7 +25,7 @@ spec:
         type: Recreate
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/swaps" # {"$imagepolicy": "apps:swaps-image-policy:name"}
-        tag: "2.71.0-33-gc5f287ce" # {"$imagepolicy": "apps:swaps-image-policy:tag"}
+        tag: "2.71.0-34-g95039a73" # {"$imagepolicy": "apps:swaps-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
@@ -33,7 +33,7 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: swaps
-        APPLICATION_VERSION: "2.71.0-33-gc5f287ce" # {"$imagepolicy": "apps:swaps-image-policy:tag"}
+        APPLICATION_VERSION: "2.71.0-34-g95039a73" # {"$imagepolicy": "apps:swaps-image-policy:tag"}
         HTTP_URL: https://admin-dev.utorg.com/api/swaps
         POSTGRES_DATABASE: uta_swaps
         POSTGRES_USER: pg-uta-swaps@dev-uta-ng-stack.iam
