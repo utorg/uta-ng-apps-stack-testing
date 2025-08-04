@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: LINEA
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-connector" # {"$imagepolicy": "apps:blockchain-connector-linea-image-policy:name"}
-        tag: "2.71.0-6-g650671ef" # {"$imagepolicy": "apps:blockchain-connector-linea-image-policy:tag"}
+        tag: "2.71.0-31-g189dafb6" # {"$imagepolicy": "apps:blockchain-connector-linea-image-policy:tag"}
