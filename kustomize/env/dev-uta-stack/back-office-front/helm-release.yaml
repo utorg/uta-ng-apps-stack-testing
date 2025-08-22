@@ -26,7 +26,7 @@ spec:
         JAEGER_PROPAGATION: "jaeger,b3,w3c"
       image:
         repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/uta-bo-frontend" # {"$imagepolicy": "apps:back-office-front-image-policy:name"}
-        tag: "2.71.0-10-g1a2feca" # {"$imagepolicy": "apps:back-office-front-image-policy:tag"}
+        tag: "2.73.0-1-ga029f71" # {"$imagepolicy": "apps:back-office-front-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
