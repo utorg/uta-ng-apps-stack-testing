@@ -10,10 +10,10 @@ resources:
   - back-office
   - back-office-front
   - blockchain-connector
-#  - blockchain-info
-#  - blockchain-parser-solana
-##  - blockchain-watcher
-#  - currency-service
+  - blockchain-info
+  - blockchain-parser-solana
+  - blockchain-watcher
+  - currency-service
 #  - dead-letter
 #  - documentation
 #  - fee-service
