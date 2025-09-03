@@ -14,16 +14,16 @@ resources:
   - blockchain-parser-solana
   - blockchain-watcher
   - currency-service
-#  - dead-letter
-#  - documentation
-#  - fee-service
-#  - identity-manager
-#  - notifications
-#  - ramp-api
-#  - rates
-#  - rates-history
-#  - rates-publisher
-#  - sse-gateway
+  - dead-letter
+  - documentation
+  - fee-service
+  - identity-manager
+  - notifications
+  - ramp-api
+  - rates
+  - rates-history
+  - rates-publisher
+  - sse-gateway
 #  - stat-service
 #  - stories
 #  - swaps
