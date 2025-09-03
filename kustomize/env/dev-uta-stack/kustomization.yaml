@@ -28,7 +28,7 @@ resources:
   - transaction-sender
   - transactions-history
   - widgets
-  - wallet-manager
+#  - wallet-manager
 #  - sse-gateway
 #  - stat-service
 #  - stories
