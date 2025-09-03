@@ -24,7 +24,7 @@ spec:
       replicaCount: 1
       containerPort: 3000
       env:
-        APPLICATION_VERSION: "latest" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
+        APPLICATION_VERSION: "2.71.0-31-g189dafb6" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
         HTTP_ADDRESS: https://admin.utorg.com/api/blockchain-connector
         POSTGRES_DATABASE: "uta_blockchain_connector"
         TYPEORM_SYNCHRONIZE: "false"
@@ -36,7 +36,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=3200"
         IS_ACTIVITY_MODULE_ENABLED: "true"
       image:
-        tag: "latest" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
+        tag: "2.71.0-31-g189dafb6" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
       strategy:
         type: Recreate
       resources:
