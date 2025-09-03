@@ -24,14 +24,14 @@ resources:
   - rates-history
   - rates-publisher
 #  - sse-gateway
-  - stat-service
-  - stories
-  - swaps
-  - tos-service
-  - transaction-sender
-  - transactions-history
-  - wallet-manager
-  - widgets
+#  - stat-service
+#  - stories
+#  - swaps
+#  - tos-service
+#  - transaction-sender
+#  - transactions-history
+#  - wallet-manager
+#  - widgets
 patches:
   - target:
       group: helm.toolkit.fluxcd.io
