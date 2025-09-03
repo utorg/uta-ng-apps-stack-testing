@@ -27,11 +27,11 @@ resources:
   - tos-service
   - transaction-sender
   - transactions-history
+  - widgets
+  - wallet-manager
 #  - sse-gateway
 #  - stat-service
 #  - stories
-#  - wallet-manager
-#  - widgets
 patches:
   - target:
       group: helm.toolkit.fluxcd.io
