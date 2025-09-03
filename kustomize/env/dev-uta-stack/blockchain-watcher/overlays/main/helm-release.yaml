@@ -9,5 +9,5 @@ spec:
         APPLICATION_NAME: blockchain-connector-main
         IS_API_MODULE_ENABLED: true
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-watcher" # {"$imagepolicy": "apps:blockchain-watcher-main-image-policy:name"}
+        name: blockchain-watcher
         tag: "2.71.0-33-gc5f287ce" # {"$imagepolicy": "apps:blockchain-watcher-main-image-policy:tag"}

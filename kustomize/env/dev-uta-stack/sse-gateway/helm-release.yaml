@@ -31,7 +31,6 @@ spec:
         TYPEORM_SYNCHRONIZE: "false"
         TYPEORM_MIGRATIONS: "true"
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/sse-gateway" # {"$imagepolicy": "apps:sse-gateway-image-policy:name"}
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:sse-gateway-image-policy:tag"}
       resources:
         requests:
@@ -43,14 +42,14 @@ spec:
     virtualServicesHttp:
       - name: docs
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "sse-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "sse-{{ .Values.env }}.utorg.com"
         prefix: "/api/sse-gateway/api-docs"
         rewrite:
           uri: "/api-docs/"
       - name: default
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "sse-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "sse-{{ .Values.env }}.utorg.com"
         prefix: "/api/sse-gateway"
         enablePathRewriteToRoot: true
