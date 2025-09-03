@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.19.1"
+      version: "1.21.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -24,15 +24,13 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: address-book
-        HTTP_URL: https://admin-dev.utorg.com/api/address-book
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/address-book
         HTTP_DOCS_PATH: api-docs
-        POSTGRES_USER: pg-uta-address-book@dev-uta-ng-stack.iam
         POSTGRES_DATABASE: uta_address_book
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
         NODE_OPTIONS: "--max-old-space-size=1600"
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/address-book" # {"$imagepolicy": "apps:address-book-image-policy:name"}
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:address-book-image-policy:tag"}
       resources:
         requests:
@@ -43,22 +41,20 @@ spec:
           memory: "2Gi"
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-address-book"
     virtualServicesHttp:
       - name: docs
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/address-book/api-docs"
         rewrite:
           uri: "/api-docs/"
       - name: default
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/address-book"
         enablePathRewriteToRoot: true
