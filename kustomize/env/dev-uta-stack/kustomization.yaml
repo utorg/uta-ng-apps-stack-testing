@@ -6,9 +6,9 @@ resources:
   - address-book
   - admin-manager
   - alert
-#  - api
-#  - back-office
-#  - back-office-front
+  - api
+  - back-office
+  - back-office-front
 ##  - blockchain-connector
 #  - blockchain-info
 #  - blockchain-parser-solana
