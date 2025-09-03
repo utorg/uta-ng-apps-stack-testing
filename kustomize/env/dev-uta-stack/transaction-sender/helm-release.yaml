@@ -24,7 +24,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/transaction-sender" # {"$imagepolicy": "apps:transaction-sender-image-policy:name"}
         tag: "2.71.0-10-gcda27374" # {"$imagepolicy": "apps:transaction-sender-image-policy:tag"}
       resources:
         limits:
@@ -33,9 +32,8 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: transaction-sender
-        HTTP_URL: https://admin-dev.utorg.com/api/tx-sender
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/tx-sender
         POSTGRES_DATABASE: uta_transaction_sender
-        POSTGRES_USER: pg-uta-transaction-sender@dev-uta-ng-stack.iam
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
@@ -44,22 +42,20 @@ spec:
         LOST_TX_DETECTOR_EVM_MAX_RETRIES: 10
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-transaction-sender"
     virtualServicesHttp:
       - enabled: true
         name: docs
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/tx-sender/api-docs"
         rewrite:
           uri: "/api-docs"
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/tx-sender"
         enablePathRewriteToRoot: true

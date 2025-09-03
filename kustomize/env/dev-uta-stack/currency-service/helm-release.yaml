@@ -24,7 +24,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/currency-service" # {"$imagepolicy": "apps:currency-service-image-policy:name"}
         tag: "2.73.0-15-g2a536a25" # {"$imagepolicy": "apps:currency-service-image-policy:tag"}
       resources:
         limits:
@@ -33,31 +32,28 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: currency-service
-        HTTP_URL: https://admin-dev.utorg.com/api/currency-service
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/currency-service
         POSTGRES_DATABASE: uta_currency_service
-        POSTGRES_USER: pg-uta-currency-service@dev-uta-ng-stack.iam
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
         HTTP_DOCS_PATH: api-docs
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-currency-service"
     virtualServicesHttp:
       - enabled: true
         name: docs
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/currency-service/api-docs"
         rewrite:
           uri: "/api-docs"
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/currency-service"
         enablePathRewriteToRoot: true

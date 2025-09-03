@@ -26,7 +26,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/documentation" # {"$imagepolicy": "apps:documentation-image-policy:name"}
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:documentation-image-policy:tag"}
       resources:
         limits:
@@ -42,31 +41,31 @@ spec:
         HTTP_PORT: "3000"
         DOCUMENTS: |
           {
-            "address-book": "https://admin-dev.utorg.com/api/address-book/api-docs/json",
-            "api": "https://app-dev.utorg.com/api/api-docs/json",
-            "backoffice": "https://admin-dev.utorg.com/api/backoffice/api-docs/json",
-            "balance-manager": "https://admin-dev.utorg.com/api/balance-manager/api-docs/json",
-            "blockchain-connector": "https://admin-dev.utorg.com/api/blockchain-connector/api-docs/json",
-            "blockchain-info": "https://admin-dev.utorg.com/api/blockchain-info/api-docs/json",
-            "blockchain-watcher": "https://admin-dev.utorg.com/api/blockchain-watcher/api-docs/json",
-            "currency-service": "https://admin-dev.utorg.com/api/currency-service/api-docs/json",
-            "dead-letter": "https://admin-dev.utorg.com/api/dead-letter/api-docs/json",
-            "identity-manager": "https://admin-dev.utorg.com/api/identity-manager/api-docs/json",
-            "notifications": "https://app-dev.utorg.com/notifications/api-docs/json",
-            "ramp-api": "https://app-dev.utorg.com/ramp-api/api-docs/json",
-            "rates": "https://admin-dev.utorg.com/api/rates/api-docs/json",
-            "rates-publisher": "https://admin-dev.utorg.com/api/rates-publisher/api-docs/json",
-            "stat-service": "https://admin-dev.utorg.com/api/stat-service/api-docs/json",
-            "stories": "https://admin-dev.utorg.com/api/stories/api-docs/json",
-            "transactions-history": "https://admin-dev.utorg.com/api/transactions-history/api-docs/json",
-            "swaps": "https://admin-dev.utorg.com/api/swaps/api-docs/json",
-            "wallet-manager": "https://admin-dev.utorg.com/api/wallet-manager/api-docs/json",
-            "fee-service": "https://admin-dev.utorg.com/api/fee-service/api-docs/json",
-            "transaction-sender": "https://admin-dev.utorg.com/api/tx-sender/api-docs/json"
+            "address-book": "https://admin-{{ .Values.env }}.utorg.com/api/address-book/api-docs/json",
+            "api": "https://app-{{ .Values.env }}.utorg.com/api/api-docs/json",
+            "backoffice": "https://admin-{{ .Values.env }}.utorg.com/api/backoffice/api-docs/json",
+            "balance-manager": "https://admin-{{ .Values.env }}.utorg.com/api/balance-manager/api-docs/json",
+            "blockchain-connector": "https://admin-{{ .Values.env }}.utorg.com/api/blockchain-connector/api-docs/json",
+            "blockchain-info": "https://admin-{{ .Values.env }}.utorg.com/api/blockchain-info/api-docs/json",
+            "blockchain-watcher": "https://admin-{{ .Values.env }}.utorg.com/api/blockchain-watcher/api-docs/json",
+            "currency-service": "https://admin-{{ .Values.env }}.utorg.com/api/currency-service/api-docs/json",
+            "dead-letter": "https://admin-{{ .Values.env }}.utorg.com/api/dead-letter/api-docs/json",
+            "identity-manager": "https://admin-{{ .Values.env }}.utorg.com/api/identity-manager/api-docs/json",
+            "notifications": "https://app-{{ .Values.env }}.utorg.com/notifications/api-docs/json",
+            "ramp-api": "https://app-{{ .Values.env }}.utorg.com/ramp-api/api-docs/json",
+            "rates": "https://admin-{{ .Values.env }}.utorg.com/api/rates/api-docs/json",
+            "rates-publisher": "https://admin-{{ .Values.env }}.utorg.com/api/rates-publisher/api-docs/json",
+            "stat-service": "https://admin-{{ .Values.env }}.utorg.com/api/stat-service/api-docs/json",
+            "stories": "https://admin-{{ .Values.env }}.utorg.com/api/stories/api-docs/json",
+            "transactions-history": "https://admin-{{ .Values.env }}.utorg.com/api/transactions-history/api-docs/json",
+            "swaps": "https://admin-{{ .Values.env }}.utorg.com/api/swaps/api-docs/json",
+            "wallet-manager": "https://admin-{{ .Values.env }}.utorg.com/api/wallet-manager/api-docs/json",
+            "fee-service": "https://admin-{{ .Values.env }}.utorg.com/api/fee-service/api-docs/json",
+            "transaction-sender": "https://admin-{{ .Values.env }}.utorg.com/api/tx-sender/api-docs/json"
           }
     virtualServicesHttp:
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "docs-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "docs-{{ .Values.env }}.utorg.com"
         prefix: "/"

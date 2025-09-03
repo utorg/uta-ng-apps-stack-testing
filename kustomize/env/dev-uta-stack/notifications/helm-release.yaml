@@ -25,7 +25,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/notifications" # {"$imagepolicy": "apps:notifications-image-policy:name"}
         tag: "2.68.0-11-ga20fddc3" # {"$imagepolicy": "apps:notifications-image-policy:tag"}
       resources:
         limits:
@@ -34,34 +33,31 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: notifications
-        HTTP_URL: https://app-dev.utorg.com/notifications
+        HTTP_URL: https://app-{{ .Values.env }}.utorg.com/notifications
         POSTGRES_DATABASE: uta_notifications
-        POSTGRES_USER: pg-uta-notifications@dev-uta-ng-stack.iam
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
         HTTP_DOCS_PATH: api-docs
-        FIREBASE_CLIENT_EMAIL: "dev-uta-notifications-firebase@zerohub-core-0.iam.gserviceaccount.com"
+        FIREBASE_CLIENT_EMAIL: "{{ .Values.env }}-uta-notifications-firebase@zerohub-core-0.iam.gserviceaccount.com"
         FIREBASE_PROJECT_ID: "zerohub-core-0"
         TOKEN_TTL_DAYS: "60"
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-notifications"
     virtualServicesHttp:
       - enabled: true
         name: docs
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "app-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "app-{{ .Values.env }}.utorg.com"
         prefix: "/notifications/api-docs"
         rewrite:
           uri: "/api-docs"
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "app-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "app-{{ .Values.env }}.utorg.com"
         prefix: "/notifications"
         enablePathRewriteToRoot: true

@@ -30,8 +30,7 @@ spec:
       env:
         APPLICATION_NAME: blockchain-watcher
         APPLICATION_VERSION: "latest" # {"$imagepolicy": "apps:blockchain-watcher-image-policy:tag"}
-        HTTP_ADDRESS: https://admin-dev.utorg.com/api/blockchain-watcher
-        POSTGRES_USER: pg-uta-blockchain-watcher@dev-uta-ng-stack.iam
+        HTTP_ADDRESS: https://admin-{{ .Values.env }}.utorg.com/api/blockchain-watcher
         POSTGRES_DATABASE: "uta_blockchain_watcher"
         TYPEORM_SYNCHRONIZE: "false"
         TYPEORM_MIGRATIONS: "true"
@@ -45,10 +44,8 @@ spec:
         type: Recreate
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-blockchain-watcher"
       resources:
         requests:
@@ -60,14 +57,14 @@ spec:
     virtualServicesHttp:
       - name: docs
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/blockchain-watcher/api-docs"
         rewrite:
           uri: "/api-docs/"
       - name: default
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/blockchain-watcher"
         enablePathRewriteToRoot: true

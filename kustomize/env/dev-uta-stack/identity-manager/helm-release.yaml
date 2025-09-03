@@ -25,7 +25,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/identity-manager" # {"$imagepolicy": "apps:identity-manager-image-policy:name"}
         tag: "2.70.0-12-g009e7813" # {"$imagepolicy": "apps:identity-manager-image-policy:tag"}
       resources:
         limits:
@@ -34,9 +33,8 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: identity-manager
-        HTTP_URL: https://admin-dev.utorg.com/api/identity-manager
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/identity-manager
         POSTGRES_DATABASE: uta_identity_manager
-        POSTGRES_USER: pg-uta-identity-manager@dev-uta-ng-stack.iam
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
@@ -44,22 +42,20 @@ spec:
         NATS_TOKEN_SETTINGS_ENABLED: "true"
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-identity-manager"
     virtualServicesHttp:
       - enabled: true
         name: docs
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/identity-manager/api-docs"
         rewrite:
           uri: "/api-docs"
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/identity-manager"
         enablePathRewriteToRoot: true

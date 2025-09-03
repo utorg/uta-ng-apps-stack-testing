@@ -25,7 +25,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/ramp-api" # {"$imagepolicy": "apps:ramp-api-image-policy:name"}
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:ramp-api-image-policy:tag"}
       resources:
         limits:
@@ -34,14 +33,12 @@ spec:
       containerPort: 3000
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-casbin"
       env:
         APPLICATION_NAME: ramp-api
-        HTTP_URL: https://app-dev.utorg.com/ramp-api
+        HTTP_URL: https://app-{{ .Values.env }}.utorg.com/ramp-api
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
@@ -49,15 +46,15 @@ spec:
     virtualServicesHttp:
       - enabled: true
         name: docs
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "app-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "app-{{ .Values.env }}.utorg.com"
         prefix: "/ramp-api/api-docs"
         rewrite:
           uri: "/api-docs"
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "app-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "app-{{ .Values.env }}.utorg.com"
         prefix: "/ramp"
         rewrite:
           uri: "/ramp"

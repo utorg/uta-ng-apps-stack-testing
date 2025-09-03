@@ -24,7 +24,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/transactions-history" # {"$imagepolicy": "apps:transactions-history-image-policy:name"}
         tag: "2.72.0-10-gac409f54" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
       resources:
         limits:
@@ -34,9 +33,8 @@ spec:
       env:
         APPLICATION_NAME: transactions-history
         APPLICATION_VERSION: "2.72.0-10-gac409f54" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
-        HTTP_URL: https://admin-dev.utorg.com/api/transactions-history
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/transactions-history
         POSTGRES_DATABASE: uta_transactions_history
-        POSTGRES_USER: pg-uta-transactions-history@dev-uta-ng-stack.iam
         NODE_OPTIONS: "--max-old-space-size=512"
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
@@ -47,22 +45,20 @@ spec:
         LOG_LEVEL: debug
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-transactions-history"
     virtualServicesHttp:
       - enabled: true
         name: docs
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/transactions-history/api-docs"
         rewrite:
           uri: "/api-docs"
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/transactions-history"
         enablePathRewriteToRoot: true

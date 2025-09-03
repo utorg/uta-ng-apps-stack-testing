@@ -24,7 +24,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/rates" # {"$imagepolicy": "apps:rates-image-policy:name"}
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:rates-image-policy:tag"}
       resources:
         limits:
@@ -33,14 +32,12 @@ spec:
       containerPort: 3000
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-casbin"
       env:
         APPLICATION_NAME: rates
-        HTTP_URL: https://admin-dev.utorg.com/api/rates
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/rates
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
@@ -48,14 +45,14 @@ spec:
     virtualServicesHttp:
       - enabled: true
         name: docs
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/rates/api-docs"
         rewrite:
           uri: "/api-docs"
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/rates"
         enablePathRewriteToRoot: true

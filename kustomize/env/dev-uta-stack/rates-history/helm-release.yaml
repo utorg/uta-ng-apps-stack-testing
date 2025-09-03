@@ -24,7 +24,6 @@ spec:
       strategy:
         type: Recreate
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/rates-history" # {"$imagepolicy": "apps:rates-history-image-policy:name"}
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:rates-history-image-policy:tag"}
       resources:
         limits:
@@ -33,9 +32,8 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: rates-history
-        HTTP_URL: https://admin-dev.utorg.com/api/rates-history
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/rates-history
         POSTGRES_DATABASE: uta_rates_history
-        POSTGRES_USER: pg-uta-rates-history@dev-uta-ng-stack.iam
         REDIS_HOST: redis-master.uta-redis.svc.cluster.local
         REDIS_PORT: "6379"
         NODE_OPTIONS: "--max-old-space-size=1600"
@@ -44,22 +42,20 @@ spec:
         HTTP_DOCS_PATH: api-docs
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-rates-history"
     virtualServicesHttp:
       - enabled: true
         name: docs
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/rates-history/api-docs"
         rewrite:
           uri: "/api-docs"
       - enabled: true
         name: default
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/rates-history"
         enablePathRewriteToRoot: true

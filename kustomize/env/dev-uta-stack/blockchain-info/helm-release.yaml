@@ -25,7 +25,6 @@ spec:
       env:
         APPLICATION_VERSION: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
         HTTP_ADDRESS: https://admin.utorg.com/api/blockchain-info
-        POSTGRES_USER: pg-uta-blockchain-info@dev-uta-ng-stack.iam
         POSTGRES_DATABASE: uta_blockchain_info
         TYPEORM_SYNCHRONIZE: "false"
         TYPEORM_MIGRATIONS: "true"
@@ -35,7 +34,6 @@ spec:
         LOG_LEVEL: info
         NODE_OPTIONS: "--max-old-space-size=3200"
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-info" # {"$imagepolicy": "apps:blockchain-info-image-policy:name"}
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
       strategy:
         type: Recreate
@@ -48,22 +46,20 @@ spec:
           memory: "4Gi"
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-blockchain-info"
     virtualServicesHttp:
       - name: docs
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/blockchain-info/api-docs"
         rewrite:
           uri: "/api-docs/"
       - name: default
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/blockchain-info"
         enablePathRewriteToRoot: true
