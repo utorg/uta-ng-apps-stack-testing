@@ -23,7 +23,7 @@ spec:
       replicaCount: 1
       containerPort: 3000
       env:
-        APPLICATION_VERSION: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
+        APPLICATION_VERSION: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
         HTTP_ADDRESS: https://admin.utorg.com/api/blockchain-info
         POSTGRES_DATABASE: uta_blockchain_info
         TYPEORM_SYNCHRONIZE: "false"
