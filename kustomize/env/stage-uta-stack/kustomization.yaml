@@ -1,0 +1,50 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: apps
+resources:
+  - _common
+  - address-book
+  - admin-manager
+  - alert
+  - api
+  - back-office
+  - back-office-front
+  - blockchain-info
+  - blockchain-parser-solana
+  - blockchain-watcher
+  - currency-service
+  - dead-letter
+  - documentation
+  - fee-service
+  - identity-manager
+  - notifications
+  - ramp-api
+  - rates
+  - rates-history
+  - rates-publisher
+  - sse-gateway
+  - stat-service
+  - stories
+  - swaps
+  - tos-service
+  - transaction-sender
+  - transactions-history
+  - wallet-manager
+  - widgets
+patches:
+  - target:
+      group: helm.toolkit.fluxcd.io
+      version: v2
+      kind: HelmRelease
+      namespace: apps
+    patch: |-
+      - op: add
+        path: /spec/values/env
+        value: stage
+      - op: add
+        path: /spec/values/gcp
+        value:
+          projectName: "stage-uta-stack"
+          projectKey: "stage-uta-stack"
+          region: "europe-west4"
+          product: "uta"

@@ -1,0 +1,60 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: admin-manager
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.21.0"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 1
+      containerPort: 3000
+      env:
+        APPLICATION_NAME: admin-manager
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/admin-manager
+        HTTP_DOCS_PATH: api-docs
+        NODE_OPTIONS: "--max-old-space-size=500"
+        TYPEORM_SYNCHRONIZE: "false"
+        TYPEORM_MIGRATIONS: "true"
+        POSTGRES_DATABASE: uta_admin_manager
+      image:
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:admin-manager-image-policy:tag"}
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "256Mi"
+        limits:
+          cpu: "200m"
+          memory: "512Mi"
+      cloudsql:
+        enabled: true
+      workloadIdentityMapping:
+        enabled: true
+        serviceAccountName: "pg-uta-admin-manager"
+    virtualServicesHttp:
+      - name: docs
+        enabled: true
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/admin-manager/api-docs"
+        rewrite:
+          uri: "/api-docs/"
+      - name: default
+        enabled: true
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/admin-manager"
+        enablePathRewriteToRoot: true

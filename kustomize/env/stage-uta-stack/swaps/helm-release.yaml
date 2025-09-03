@@ -1,0 +1,64 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: swaps
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.21.0"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 1
+      strategy:
+        type: Recreate
+      image:
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:swaps-image-policy:tag"}
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "2Gi"
+      containerPort: 3000
+      env:
+        APPLICATION_NAME: swaps
+        APPLICATION_VERSION: "2.73.0-13-g312a873d" # {"$imagepolicy": "apps:swaps-image-policy:tag"}
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/swaps
+        POSTGRES_DATABASE: uta_swaps
+        NODE_OPTIONS: "--max-old-space-size=512"
+        TYPEORM_MIGRATIONS: "true"
+        TYPEORM_SYNCHRONIZE: "false"
+        HTTP_DOCS_PATH: api-docs
+        PROFILER_ENABLED: "false"
+        PROFILER_GCLOUD_PROJECT: zerohub-core-0
+        PROFILER_GCLOUD_ZONE: europe-west4-a
+        LOG_LEVEL: debug
+      cloudsql:
+        enabled: true
+      workloadIdentityMapping:
+        enabled: true
+        serviceAccountName: "pg-uta-swaps"
+    virtualServicesHttp:
+      - enabled: true
+        name: docs
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/swaps/api-docs"
+        rewrite:
+          uri: "/api-docs"
+      - enabled: true
+        name: default
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/swaps"
+        enablePathRewriteToRoot: true

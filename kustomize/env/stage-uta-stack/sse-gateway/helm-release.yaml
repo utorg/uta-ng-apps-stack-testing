@@ -1,0 +1,55 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sse-gateway
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.21.0"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+        - "sse-gateway-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 1
+      containerPort: 3000
+      env:
+        APPLICATION_NAME: sse-gateway
+        HTTP_ADDRESS: https://sse.utorg.com
+        HTTP_DOCS_PATH: api-docs
+        NODE_OPTIONS: "--max-old-space-size=1600"
+        TYPEORM_SYNCHRONIZE: "false"
+        TYPEORM_MIGRATIONS: "true"
+      image:
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:sse-gateway-image-policy:tag"}
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "256Mi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"
+    virtualServicesHttp:
+      - name: docs
+        enabled: true
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "sse-{{ .Values.env }}.utorg.com"
+        prefix: "/api/sse-gateway/api-docs"
+        rewrite:
+          uri: "/api-docs/"
+      - name: default
+        enabled: true
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "sse-{{ .Values.env }}.utorg.com"
+        prefix: "/api/sse-gateway"
+        enablePathRewriteToRoot: true

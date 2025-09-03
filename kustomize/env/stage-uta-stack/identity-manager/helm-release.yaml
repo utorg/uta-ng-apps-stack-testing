@@ -1,0 +1,61 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: identity-manager
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.21.0"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+        - "identity-manager-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 1
+      strategy:
+        type: Recreate
+      image:
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:identity-manager-image-policy:tag"}
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "2Gi"
+      containerPort: 3000
+      env:
+        APPLICATION_NAME: identity-manager
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/identity-manager
+        POSTGRES_DATABASE: uta_identity_manager
+        NODE_OPTIONS: "--max-old-space-size=1600"
+        TYPEORM_MIGRATIONS: "true"
+        TYPEORM_SYNCHRONIZE: "false"
+        HTTP_DOCS_PATH: api-docs
+        NATS_TOKEN_SETTINGS_ENABLED: "true"
+      cloudsql:
+        enabled: true
+      workloadIdentityMapping:
+        enabled: true
+        serviceAccountName: "pg-uta-identity-manager"
+    virtualServicesHttp:
+      - enabled: true
+        name: docs
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/identity-manager/api-docs"
+        rewrite:
+          uri: "/api-docs"
+      - enabled: true
+        name: default
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/identity-manager"
+        enablePathRewriteToRoot: true

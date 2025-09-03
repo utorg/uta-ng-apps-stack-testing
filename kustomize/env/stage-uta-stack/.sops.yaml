@@ -1,0 +1,4 @@
+creation_rules:
+  - path_regex: .*.yaml
+    encrypted_regex: ^(data|stringData)$
+    gcp_kms: projects/stage-uta-stack/locations/global/keyRings/stage-uta-stack-sops/cryptoKeys/stage-uta-stack-sops-default

@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-watcher-main
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-main
+        IS_API_MODULE_ENABLED: true
+      image:
+        name: blockchain-watcher
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:blockchain-watcher-main-image-policy:tag"}

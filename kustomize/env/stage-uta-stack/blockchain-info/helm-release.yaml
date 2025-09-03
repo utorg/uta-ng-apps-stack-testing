@@ -1,0 +1,65 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-info
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.21.0"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envConfigMapNames:
+        - common-env-cm
+      envSecretNames:
+        - common-secret
+    deployment:
+      replicaCount: 1
+      containerPort: 3000
+      env:
+        APPLICATION_VERSION: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
+        HTTP_ADDRESS: https://admin.utorg.com/api/blockchain-info
+        POSTGRES_DATABASE: uta_blockchain_info
+        TYPEORM_SYNCHRONIZE: "false"
+        TYPEORM_MIGRATIONS: "true"
+        HTTP_DOCS_PATH: api-docs
+        NATS_DEBUG: "false"
+        NODE_ENV: production
+        LOG_LEVEL: info
+        NODE_OPTIONS: "--max-old-space-size=3200"
+      image:
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
+      strategy:
+        type: Recreate
+      resources:
+        requests:
+          cpu: 10m
+          memory: 128Mi
+        limits:
+          cpu: "1"
+          memory: "4Gi"
+      cloudsql:
+        enabled: true
+      workloadIdentityMapping:
+        enabled: true
+        serviceAccountName: "pg-uta-blockchain-info"
+    virtualServicesHttp:
+      - name: docs
+        enabled: true
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/blockchain-info/api-docs"
+        rewrite:
+          uri: "/api-docs/"
+      - name: default
+        enabled: true
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/blockchain-info"
+        enablePathRewriteToRoot: true

@@ -1,0 +1,60 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: stat-service
+  namespace: apps
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: app
+      version: "1.21.0"
+      sourceRef:
+        kind: HelmRepository
+        name: default
+      interval: 5m
+  values:
+    global:
+      envSecretNames:
+        - "common-secret"
+        - "stat-service-secret"
+      envConfigMapNames:
+        - "common-env-cm"
+    deployment:
+      replicaCount: 1
+      strategy:
+        type: Recreate
+      image:
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:stat-service-image-policy:tag"}
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "2Gi"
+      containerPort: 3000
+      env:
+        APPLICATION_NAME: stat-service
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/stat-service
+        POSTGRES_DATABASE: uta_stat_service
+        NODE_OPTIONS: "--max-old-space-size=1600"
+        TYPEORM_MIGRATIONS: "true"
+        TYPEORM_SYNCHRONIZE: "false"
+        HTTP_DOCS_PATH: api-docs
+      cloudsql:
+        enabled: true
+      workloadIdentityMapping:
+        enabled: true
+        serviceAccountName: "pg-uta-stat-service"
+    virtualServicesHttp:
+      - enabled: true
+        name: docs
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/stat-service/api-docs"
+        rewrite:
+          uri: "/api-docs"
+      - enabled: true
+        name: default
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
+        prefix: "/api/stat-service"
+        enablePathRewriteToRoot: true
