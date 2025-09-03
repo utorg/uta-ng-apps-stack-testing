@@ -23,13 +23,13 @@ resources:
   - rates
   - rates-history
   - rates-publisher
+  - swaps
+  - tos-service
+  - transaction-sender
+  - transactions-history
 #  - sse-gateway
 #  - stat-service
 #  - stories
-#  - swaps
-#  - tos-service
-#  - transaction-sender
-#  - transactions-history
 #  - wallet-manager
 #  - widgets
 patches:
