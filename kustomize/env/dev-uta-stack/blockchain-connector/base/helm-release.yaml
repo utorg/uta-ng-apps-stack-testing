@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.19.1"
+      version: "1.21.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -26,7 +26,6 @@ spec:
       env:
         APPLICATION_VERSION: "latest" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
         HTTP_ADDRESS: https://admin.utorg.com/api/blockchain-connector
-        POSTGRES_USER: "pg-uta-blockchain-connector@dev-uta-ng-stack.iam"
         POSTGRES_DATABASE: "uta_blockchain_connector"
         TYPEORM_SYNCHRONIZE: "false"
         TYPEORM_MIGRATIONS: "true"
@@ -37,7 +36,6 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=3200"
         IS_ACTIVITY_MODULE_ENABLED: "true"
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-connector" # {"$imagepolicy": "apps:blockchain-connector-image-policy:name"}
         tag: "latest" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
       strategy:
         type: Recreate
@@ -50,22 +48,20 @@ spec:
           memory: "4Gi"
       cloudsql:
         enabled: true
-        connectionString: "dev-uta-ng-stack:europe-west4:dev-uta-ng-stack-postgres"
       workloadIdentityMapping:
         enabled: true
-        project: "dev-uta-ng-stack"
         serviceAccountName: "pg-uta-blockchain-connector"
     virtualServicesHttp:
       - name: docs
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/blockchain-connector/api-docs"
         rewrite:
           uri: "/api-docs/"
       - name: default
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/blockchain-connector"
         enablePathRewriteToRoot: true

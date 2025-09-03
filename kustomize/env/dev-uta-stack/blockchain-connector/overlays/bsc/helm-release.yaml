@@ -10,7 +10,7 @@ spec:
         INSTANCE_CHAINS: BSC
         NODE_OPTIONS: "--max-old-space-size=6400"
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-connector" # {"$imagepolicy": "apps:blockchain-connector-bsc-image-policy:name"}
+        name: "blockchain-connector"
         tag: "2.71.0-31-g189dafb6" # {"$imagepolicy": "apps:blockchain-connector-bsc-image-policy:tag"}
       resources:
         limits:

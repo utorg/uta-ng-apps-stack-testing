@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.19.1"
+      version: "1.21.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -24,12 +24,11 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: back-office
-        HTTP_URL: https://admin-dev.utorg.com/api/backoffice
+        HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/backoffice
         HTTP_DOCS_PATH: api-docs
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_SYNCHRONIZE: "false"
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/back-office" # {"$imagepolicy": "apps:back-office-image-policy:name"}
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:back-office-image-policy:tag"}
       resources:
         requests:
@@ -41,14 +40,14 @@ spec:
     virtualServicesHttp:
       - name: docs
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/backoffice/api-docs"
         rewrite:
           uri: "/api-docs/"
       - name: default
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/api/backoffice"
         enablePathRewriteToRoot: true

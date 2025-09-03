@@ -9,5 +9,5 @@ spec:
         APPLICATION_NAME: blockchain-connector-aurora
         INSTANCE_CHAINS: AURORA
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-connector" # {"$imagepolicy": "apps:blockchain-connector-aurora-image-policy:name"}
+        name: "blockchain-connector"
         tag: "2.71.0-31-g189dafb6" # {"$imagepolicy": "apps:blockchain-connector-aurora-image-policy:tag"}

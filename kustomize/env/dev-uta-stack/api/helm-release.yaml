@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.19.1"
+      version: "1.21.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -24,13 +24,12 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: api
-        HTTP_URL: https://app-dev.utorg.com/api
+        HTTP_URL: https://app-{{ .Values.env }}.utorg.com/api
         HTTP_DOCS_PATH: api-docs
         NATS_DEBUG: "false"
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_SYNCHRONIZE: "false"
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/api" # {"$imagepolicy": "apps:api-image-policy:name"}
         tag: "2.73.0-13-g312a873d" # {"$imagepolicy": "apps:api-image-policy:tag"}
       resources:
         requests:
@@ -42,14 +41,14 @@ spec:
     virtualServicesHttp:
       - name: docs
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "app-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "app-{{ .Values.env }}.utorg.com"
         prefix: "/api/api-docs"
         rewrite:
           uri: "/api-docs/"
       - name: default
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "app-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "app-{{ .Values.env }}.utorg.com"
         prefix: "/api"
         enablePathRewriteToRoot: true

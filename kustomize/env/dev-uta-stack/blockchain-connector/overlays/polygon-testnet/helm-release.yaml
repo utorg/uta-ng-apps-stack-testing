@@ -9,5 +9,5 @@ spec:
         APPLICATION_NAME: blockchain-connector-polygon-testnet
         INSTANCE_CHAINS: POLYGON_TESTNET
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/blockchain-connector" # {"$imagepolicy": "apps:blockchain-connector-testnet-image-policy:name"}
+        name: "blockchain-connector"
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:blockchain-connector-testnet-image-policy:tag"}

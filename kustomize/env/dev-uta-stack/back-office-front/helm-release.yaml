@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app
-      version: "1.19.1"
+      version: "1.21.0"
       sourceRef:
         kind: HelmRepository
         name: default
@@ -25,7 +25,6 @@ spec:
         JAEGER_SERVICE_NAME: "back-office-front.uta"
         JAEGER_PROPAGATION: "jaeger,b3,w3c"
       image:
-        repository: "europe-west4-docker.pkg.dev/dev-uta-ng-stack/dev-uta-ng-stack-cr/uta-bo-frontend" # {"$imagepolicy": "apps:back-office-front-image-policy:name"}
         tag: "2.73.0-1-ga029f71" # {"$imagepolicy": "apps:back-office-front-image-policy:tag"}
       resources:
         requests:
@@ -41,6 +40,6 @@ spec:
     virtualServicesHttp:
       - name: default
         enabled: true
-        gateway: "istio-ingress/uta-dev-utorg-com"
-        host: "admin-dev.utorg.com"
+        gateway: "istio-ingress/uta-{{ .Values.env }}-utorg-com"
+        host: "admin-{{ .Values.env }}.utorg.com"
         prefix: "/"
