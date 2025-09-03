@@ -23,15 +23,15 @@ resources:
   - rates
   - rates-history
   - rates-publisher
+  - sse-gateway
+  - stat-service
+  - stories
   - swaps
   - tos-service
   - transaction-sender
   - transactions-history
+  - wallet-manager
   - widgets
-#  - wallet-manager
-#  - sse-gateway
-#  - stat-service
-#  - stories
 patches:
   - target:
       group: helm.toolkit.fluxcd.io
