@@ -6,32 +6,32 @@ resources:
   - address-book
   - admin-manager
   - alert
-  - api
-  - back-office
-  - back-office-front
-#  - blockchain-connector
-  - blockchain-info
-  - blockchain-parser-solana
-#  - blockchain-watcher
-  - currency-service
-  - dead-letter
-  - documentation
-  - fee-service
-  - identity-manager
-  - notifications
-  - ramp-api
-  - rates
-  - rates-history
-  - rates-publisher
-  - sse-gateway
-  - stat-service
-  - stories
-  - swaps
-  - tos-service
-  - transaction-sender
-  - transactions-history
-  - wallet-manager
-  - widgets
+#  - api
+#  - back-office
+#  - back-office-front
+##  - blockchain-connector
+#  - blockchain-info
+#  - blockchain-parser-solana
+##  - blockchain-watcher
+#  - currency-service
+#  - dead-letter
+#  - documentation
+#  - fee-service
+#  - identity-manager
+#  - notifications
+#  - ramp-api
+#  - rates
+#  - rates-history
+#  - rates-publisher
+#  - sse-gateway
+#  - stat-service
+#  - stories
+#  - swaps
+#  - tos-service
+#  - transaction-sender
+#  - transactions-history
+#  - wallet-manager
+#  - widgets
 patches:
   - target:
       group: helm.toolkit.fluxcd.io
