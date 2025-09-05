@@ -18,5 +18,6 @@ resources:
   - ./overlays/polygon
   - ./overlays/polygon-testnet
   - ./overlays/solana
+  - ./overlays/ton
   - ./overlays/tron
   - ./overlays/zksync
