@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-ton
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-ton
+        INSTANCE_CHAINS: ton
+      image:
+        name: "blockchain-connector"
+        tag: "2.71.0-31-g189dafb6" # {"$imagepolicy": "apps:blockchain-connector-ton-image-policy:tag"}
