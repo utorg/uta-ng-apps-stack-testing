@@ -32,7 +32,7 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: transactions-history
-        APPLICATION_VERSION: "2.72.0-10-gac409f54" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
+        APPLICATION_VERSION: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
         HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/transactions-history
         POSTGRES_DATABASE: uta_transactions_history
         NODE_OPTIONS: "--max-old-space-size=512"
