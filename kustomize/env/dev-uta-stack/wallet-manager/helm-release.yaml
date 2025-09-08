@@ -25,7 +25,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.52.0-239-g47205cad" # {"$imagepolicy": "apps:wallet-manager-image-policy:tag"}
+        tag: "2.77.0-4-gbb975c5e" # {"$imagepolicy": "apps:wallet-manager-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
