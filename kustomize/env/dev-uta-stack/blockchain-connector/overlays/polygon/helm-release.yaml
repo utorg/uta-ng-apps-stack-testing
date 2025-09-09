@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: POLYGON
       image:
         name: "blockchain-connector"
-        tag: "2.77.0-5-gd8216abe" # {"$imagepolicy": "apps:blockchain-connector-polygon-image-policy:tag"}
+        tag: "2.77.0-7-g6b363deb" # {"$imagepolicy": "apps:blockchain-connector-polygon-image-policy:tag"}
