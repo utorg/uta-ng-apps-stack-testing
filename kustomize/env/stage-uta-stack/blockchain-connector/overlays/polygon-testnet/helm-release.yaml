@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-polygon-testnet
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-polygon-testnet
+        INSTANCE_CHAINS: POLYGON_TESTNET
+      image:
+        name: "blockchain-connector"
+        tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:blockchain-connector-testnet-image-policy:tag"}

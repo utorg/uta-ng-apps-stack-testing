@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-aurora
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-aurora
+        INSTANCE_CHAINS: AURORA
+      image:
+        name: "blockchain-connector"
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:blockchain-connector-aurora-image-policy:tag"}

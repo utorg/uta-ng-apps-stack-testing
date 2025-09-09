@@ -9,6 +9,7 @@ resources:
   - api
   - back-office
   - back-office-front
+  - blockchain-connector
   - blockchain-info
   - blockchain-parser-solana
   - blockchain-watcher

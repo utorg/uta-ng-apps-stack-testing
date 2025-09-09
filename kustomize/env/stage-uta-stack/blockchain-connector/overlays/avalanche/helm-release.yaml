@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-avalanche
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-avalanche
+        INSTANCE_CHAINS: AVALANCHE
+      image:
+        name: "blockchain-connector"
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:blockchain-connector-avalanche-image-policy:tag"}

@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blockchain-connector-bitcoin
+spec:
+  values:
+    deployment:
+      env:
+        APPLICATION_NAME: blockchain-connector-bitcoin
+        INSTANCE_CHAINS: BITCOIN
+      image:
+        name: "blockchain-connector"
+        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:blockchain-connector-bitcoin-image-policy:tag"}
