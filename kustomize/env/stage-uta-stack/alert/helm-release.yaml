@@ -31,7 +31,7 @@ spec:
         TYPEORM_SYNCHRONIZE: "false"
         TYPEORM_MIGRATIONS: "true"
       image:
-        tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:alert-image-policy:tag"}
+        tag: "2.77.0-6-g4072a6c8" # {"$imagepolicy": "apps:alert-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
