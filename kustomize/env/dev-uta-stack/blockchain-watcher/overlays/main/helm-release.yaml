@@ -10,4 +10,4 @@ spec:
         IS_API_MODULE_ENABLED: true
       image:
         name: blockchain-watcher
-        tag: "2.73.0-40-ga684ae28" # {"$imagepolicy": "apps:blockchain-watcher-main-image-policy:tag"}
+        tag: "2.77.0-22-g86edf21b" # {"$imagepolicy": "apps:blockchain-watcher-main-image-policy:tag"}
