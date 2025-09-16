@@ -35,6 +35,7 @@ spec:
         LOG_LEVEL: info
         NODE_OPTIONS: "--max-old-space-size=3200"
         IS_ACTIVITY_MODULE_ENABLED: "true"
+        RECEIVER_DISABLED_FORCE: "false"
       image:
         tag: "2.71.0-31-g189dafb6" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
       strategy:

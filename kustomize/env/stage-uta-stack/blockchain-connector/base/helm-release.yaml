@@ -35,7 +35,7 @@ spec:
         LOG_LEVEL: info
         NODE_OPTIONS: "--max-old-space-size=3200"
         IS_ACTIVITY_MODULE_ENABLED: "true"
-        RECEIVER_DISABLED_FORCE: "false" # special flag for stage environment (do not use for prod)
+        RECEIVER_DISABLED_FORCE: "true" # special flag for stage environment (do not use for prod)
       image:
         tag: "2.73.0-16-g0f3ed9d5" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
       strategy:
