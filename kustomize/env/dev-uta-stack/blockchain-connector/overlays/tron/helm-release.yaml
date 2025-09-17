@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: TRON
       image:
         name: "blockchain-connector"
-        tag: "2.77.0-17-g85a16c49" # {"$imagepolicy": "apps:blockchain-connector-tron-image-policy:tag"}
+        tag: "2.78.0-6-ge49411d5" # {"$imagepolicy": "apps:blockchain-connector-tron-image-policy:tag"}
