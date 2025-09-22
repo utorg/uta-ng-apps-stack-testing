@@ -24,7 +24,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.77.0-6-geecb56f9" # {"$imagepolicy": "apps:transaction-sender-image-policy:tag"}
+        tag: "2.78.0-16-ga0d45eb9" # {"$imagepolicy": "apps:transaction-sender-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
