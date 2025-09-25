@@ -30,6 +30,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_SYNCHRONIZE: "false"
         TYPEORM_MIGRATIONS: "true"
+        POSTGRES_DATABASE: uta_alert
       image:
         tag: "2.52.0-204-ged8cc015" # {"$imagepolicy": "apps:alert-image-policy:tag"}
       resources:
@@ -39,6 +40,11 @@ spec:
         limits:
           cpu: "500m"
           memory: "2Gi"
+      cloudsql:
+        enabled: true
+      workloadIdentityMapping:
+        enabled: true
+        serviceAccountName: "pg-uta-alert"
     virtualServicesHttp:
       - name: docs
         enabled: true
