@@ -39,7 +39,7 @@ spec:
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
         HTTP_DOCS_PATH: api-docs
-        FIREBASE_CLIENT_EMAIL: "{{ .Values.env }}-uta-notifications-firebase@zerohub-core-0.iam.gserviceaccount.com"
+        FIREBASE_CLIENT_EMAIL: "dev-uta-notifications-firebase@zerohub-core-0.iam.gserviceaccount.com" # dev account valid for stage and dev
         FIREBASE_PROJECT_ID: "zerohub-core-0"
         TOKEN_TTL_DAYS: "60"
       cloudsql:
