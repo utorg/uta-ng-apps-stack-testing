@@ -31,7 +31,7 @@ spec:
         TYPEORM_SYNCHRONIZE: "false"
         TYPEORM_MIGRATIONS: "true"
       image:
-        tag: "2.77.0-6-g4072a6c8" # {"$imagepolicy": "apps:sse-gateway-image-policy:tag"}
+        tag: "2.83.0-2-g26349a52" # {"$imagepolicy": "apps:sse-gateway-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
