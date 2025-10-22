@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: GNOSIS
       image:
         name: "blockchain-connector"
-        tag: "2.78.0-16-ga0d45eb9" # {"$imagepolicy": "apps:blockchain-connector-gnosis-image-policy:tag"}
+        tag: "2.83.0-0-g5e163f74" # {"$imagepolicy": "apps:blockchain-connector-gnosis-image-policy:tag"}
