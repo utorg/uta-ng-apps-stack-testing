@@ -17,6 +17,7 @@ spec:
     global:
       envSecretNames:
         - "common-secret"
+        - "rates-publisher-secret"
       envConfigMapNames:
         - "common-env-cm"
     deployment:
@@ -38,6 +39,7 @@ spec:
         TYPEORM_MIGRATIONS: "true"
         TYPEORM_SYNCHRONIZE: "false"
         HTTP_DOCS_PATH: api-docs
+        PROVIDERS_OER_CONFIG_URL: https://openexchangerates.org/api/latest.json
       cloudsql:
         enabled: true
       workloadIdentityMapping:
