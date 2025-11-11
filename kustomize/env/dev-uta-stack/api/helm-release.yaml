@@ -30,7 +30,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_SYNCHRONIZE: "false"
       image:
-        tag: "2.83.0-4-g4a04ff97" # {"$imagepolicy": "apps:api-image-policy:tag"}
+        tag: "2.84.0-14-g53188d4f" # {"$imagepolicy": "apps:api-image-policy:tag"}
       resources:
         requests:
           cpu: "100m"
