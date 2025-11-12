@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: AVALANCHE
       image:
         name: "blockchain-connector"
-        tag: "2.84.0-2-gcc4c98ff" # {"$imagepolicy": "apps:blockchain-connector-avalanche-image-policy:tag"}
+        tag: "2.85.0-3-gc941e0de" # {"$imagepolicy": "apps:blockchain-connector-avalanche-image-policy:tag"}
