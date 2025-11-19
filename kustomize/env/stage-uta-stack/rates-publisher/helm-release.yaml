@@ -25,7 +25,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.85.0-5-g05843053" # {"$imagepolicy": "apps:rates-publisher-image-policy:tag"}
+        tag: "2.85.0-22-g18fbb606" # {"$imagepolicy": "apps:rates-publisher-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
