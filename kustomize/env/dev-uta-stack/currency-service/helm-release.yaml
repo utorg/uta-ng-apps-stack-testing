@@ -24,7 +24,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.73.0-40-ga684ae28" # {"$imagepolicy": "apps:currency-service-image-policy:tag"}
+        tag: "2.85.0-21-g2ad6d590" # {"$imagepolicy": "apps:currency-service-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
