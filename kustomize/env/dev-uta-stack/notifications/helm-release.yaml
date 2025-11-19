@@ -25,7 +25,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.68.0-11-ga20fddc3" # {"$imagepolicy": "apps:notifications-image-policy:tag"}
+        tag: "2.85.0-21-g2ad6d590" # {"$imagepolicy": "apps:notifications-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"

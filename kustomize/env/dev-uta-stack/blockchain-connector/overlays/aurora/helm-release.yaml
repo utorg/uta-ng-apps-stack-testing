@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: AURORA
       image:
         name: "blockchain-connector"
-        tag: "2.84.0-3-g0762720c" # {"$imagepolicy": "apps:blockchain-connector-aurora-image-policy:tag"}
+        tag: "2.85.0-21-g2ad6d590" # {"$imagepolicy": "apps:blockchain-connector-aurora-image-policy:tag"}
