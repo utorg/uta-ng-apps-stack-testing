@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: LINEA
       image:
         name: "blockchain-connector"
-        tag: "2.85.0-3-gc941e0de" # {"$imagepolicy": "apps:blockchain-connector-linea-image-policy:tag"}
+        tag: "2.88.0-1-g4bea2187" # {"$imagepolicy": "apps:blockchain-connector-linea-image-policy:tag"}
