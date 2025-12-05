@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: ZKSYNC
       image:
         name: "blockchain-connector"
-        tag: "2.86.0-14-g6e918b95" # {"$imagepolicy": "apps:blockchain-connector-zksync-image-policy:tag"}
+        tag: "2.88.0-8-gab705a61" # {"$imagepolicy": "apps:blockchain-connector-zksync-image-policy:tag"}
