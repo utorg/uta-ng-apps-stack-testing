@@ -11,7 +11,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=6400"
       image:
         name: "blockchain-connector"
-        tag: "2.88.0-11-gec981547" # {"$imagepolicy": "apps:blockchain-connector-bsc-image-policy:tag"}
+        tag: "2.89.0-13-g518e0f03" # {"$imagepolicy": "apps:blockchain-connector-bsc-image-policy:tag"}
       resources:
         limits:
           cpu: "2"
