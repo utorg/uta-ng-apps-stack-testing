@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: FANTOM
       image:
         name: "blockchain-connector"
-        tag: "2.88.0-11-gec981547" # {"$imagepolicy": "apps:blockchain-connector-fantom-image-policy:tag"}
+        tag: "2.89.0-13-g518e0f03" # {"$imagepolicy": "apps:blockchain-connector-fantom-image-policy:tag"}
