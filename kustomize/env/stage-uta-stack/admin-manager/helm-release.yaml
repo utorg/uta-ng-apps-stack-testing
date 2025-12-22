@@ -31,7 +31,7 @@ spec:
         TYPEORM_MIGRATIONS: "true"
         POSTGRES_DATABASE: uta_admin_manager
       image:
-        tag: "2.84.0-2-gcc4c98ff" # {"$imagepolicy": "apps:admin-manager-image-policy:tag"}
+        tag: "2.90.0-23-g8df1d3c6" # {"$imagepolicy": "apps:admin-manager-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
