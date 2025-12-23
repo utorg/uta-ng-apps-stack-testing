@@ -15,7 +15,7 @@ spec:
       interval: 5m
   values:
     deployment:
-      replicaCount: 0
+      replicaCount: 2
       startupProbe:
         http:
           port: 80
