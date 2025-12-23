@@ -25,7 +25,7 @@ spec:
         APPLICATION_NAME: cv-tos-web-form
       containerPort: 80
       image:
-        tag: "0.0.0-stage-0-g107e5c2" # {"$imagepolicy": "apps:cv-tos-web-form-image-policy:tag"}
+        tag: "0.0.0-stage-3-ga5248e9" # {"$imagepolicy": "apps:cv-tos-web-form-image-policy:tag"}
       resources:
         requests:
           cpu: "50m"
