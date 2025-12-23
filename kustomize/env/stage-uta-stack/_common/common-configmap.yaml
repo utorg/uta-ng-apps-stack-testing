@@ -8,7 +8,7 @@ data:
   HEALTH_PORT: "3100"
   HTTP_PORT: "3000"
   NATS_SERVERS: nats-0.nats-headless.nats:4222,nats-1.nats-headless.nats:4222,nats-2.nats-headless.nats:4222
-  REDIS_HOST: keydb.keydb
+  REDIS_HOST: df-main.dragonfly
   REDIS_PORT: "6379"
   POSTGRES_HOST: 127.0.0.1
   POSTGRES_PORT: "5000"
