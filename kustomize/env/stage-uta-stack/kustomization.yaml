@@ -14,6 +14,7 @@ resources:
   - blockchain-parser-solana
   - blockchain-watcher
   - currency-service
+  - cv-tos-web-form
   - dead-letter
   - documentation
   - fee-service
