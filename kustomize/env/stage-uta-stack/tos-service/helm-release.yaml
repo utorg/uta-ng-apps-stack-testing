@@ -24,7 +24,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.90.1-1-gc4ccc2f7" # {"$imagepolicy": "apps:tos-service-image-policy:tag"}
+        tag: "2.90.3-2-g8eee21a3" # {"$imagepolicy": "apps:tos-service-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
