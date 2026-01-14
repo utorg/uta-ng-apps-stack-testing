@@ -24,7 +24,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.90.3-13-g38a19aff" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
+        tag: "2.90.5-1-g502bd266" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
@@ -32,7 +32,7 @@ spec:
       containerPort: 3000
       env:
         APPLICATION_NAME: transactions-history
-        APPLICATION_VERSION: "2.90.3-13-g38a19aff" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
+        APPLICATION_VERSION: "2.90.5-1-g502bd266" # {"$imagepolicy": "apps:transactions-history-image-policy:tag"}
         HTTP_URL: https://admin-{{ .Values.env }}.utorg.com/api/transactions-history
         POSTGRES_DATABASE: uta_transactions_history
         NODE_OPTIONS: "--max-old-space-size=512"
