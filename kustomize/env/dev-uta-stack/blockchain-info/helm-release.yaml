@@ -23,7 +23,7 @@ spec:
       replicaCount: 1
       containerPort: 3000
       env:
-        APPLICATION_VERSION: "2.90.5-1-g502bd266" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
+        APPLICATION_VERSION: "2.90.5-8-gb9a0867a" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
         HTTP_ADDRESS: https://admin.utorg.com/api/blockchain-info
         POSTGRES_DATABASE: uta_blockchain_info
         TYPEORM_SYNCHRONIZE: "false"
@@ -34,7 +34,7 @@ spec:
         LOG_LEVEL: info
         NODE_OPTIONS: "--max-old-space-size=3200"
       image:
-        tag: "2.90.5-1-g502bd266" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
+        tag: "2.90.5-8-gb9a0867a" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
       strategy:
         type: Recreate
       resources:
