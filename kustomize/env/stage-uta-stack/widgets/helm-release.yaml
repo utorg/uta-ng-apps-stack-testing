@@ -24,7 +24,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.84.0-2-gcc4c98ff" # {"$imagepolicy": "apps:widgets-image-policy:tag"}
+        tag: "2.91.0-1-g5fe7cec5" # {"$imagepolicy": "apps:widgets-image-policy:tag"}
       resources:
         limits:
           cpu: "1"
