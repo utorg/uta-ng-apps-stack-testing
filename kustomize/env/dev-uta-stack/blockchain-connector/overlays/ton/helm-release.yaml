@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: TON
       image:
         name: "blockchain-connector"
-        tag: "2.90.5-1-g502bd266" # {"$imagepolicy": "apps:blockchain-connector-ton-image-policy:tag"}
+        tag: "2.90.5-8-gb9a0867a" # {"$imagepolicy": "apps:blockchain-connector-ton-image-policy:tag"}
