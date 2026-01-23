@@ -8,14 +8,25 @@ enabled: true
 build:
   timeout_minutes: 20
 
-# Docker disabled for testing - tests only, no image push
+# Docker enabled for testing - images built to testing registry but not deployed
 docker:
-  enabled: false
+  enabled: true
   image_name: uta-backend-testing
+  repository: github-testing-cr
+  dockerfile: "./docker/actions/app.dockerfile"
+  modules_dockerfile: "./docker/actions/modules.dockerfile"
+  platforms: "linux/amd64"
   # Build args required by docker/actions/app.dockerfile
   # The 'app' arg is automatically set to the service name for matrix builds
   build_args:
     modules: "node:20-alpine"
+
+# NPM registry for @ut-libs packages (production registry for shared libs)
+npm:
+  registries:
+    - scope: "@ut-libs"
+      project: "global-410306"
+      repository: "npm"
 
 # Monorepo Configuration
 # uta-backend is a NestJS monorepo with apps/ directory structure
