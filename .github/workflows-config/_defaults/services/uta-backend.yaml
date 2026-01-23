@@ -19,20 +19,17 @@ monorepo:
   enabled: true
   apps_path: "apps"
   libs_path: "libs"
-  # List of apps that can be built (excludes test apps, playgrounds)
+  # List of apps that can be built (must match actual directory names in test repo)
+  # Note: uta-backend-testing has different app names than production
   buildable_apps:
     - api
-    - wallet
     - notifications
-    - scheduler
-    - admin
-    - webhooks
-    - worker
-  # Apps excluded from builds (test utilities, playgrounds)
+    - rates
+  # Apps excluded from builds (test utilities, playgrounds, documentation)
   excluded_apps:
     - playground
     - stories
-    - e2e
+    - documentation
 
 # Feature flags
 features:
