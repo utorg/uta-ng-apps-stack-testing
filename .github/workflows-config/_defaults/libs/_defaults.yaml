@@ -19,7 +19,7 @@ java:
 gcp:
   project_id: zerohub-core-0
   region: europe-west4
-  workload_identity_provider: "projects/123456789/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+  workload_identity_provider: "projects/360996291169/locations/global/workloadIdentityPools/testing-utp-stack/providers/github"
   service_account: "github-actions@zerohub-core-0.iam.gserviceaccount.com"
 
 # Maven Repository Configuration
