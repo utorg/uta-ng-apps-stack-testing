@@ -21,12 +21,12 @@ docker:
   build_args:
     modules: "node:20-alpine"
 
-# NPM registry for @ut-libs packages (production registry for shared libs)
+# NPM registry for @ut-libs packages (testing registry)
 npm:
   registries:
     - scope: "@ut-libs"
-      project: "global-410306"
-      repository: "npm"
+      project: "zerohub-core-0"
+      repository: "github-testing-npm"
 
 # Monorepo Configuration
 # uta-backend is a NestJS monorepo with apps/ directory structure
