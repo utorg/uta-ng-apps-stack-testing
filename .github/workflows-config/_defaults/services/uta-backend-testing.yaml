@@ -1,0 +1,58 @@
+# uta-backend-testing Service Configuration
+# UTA backend monorepo - isolated testing repository - no artifacts published
+
+service_id: uta-backend-testing
+type: nestjs
+enabled: true
+
+build:
+  timeout_minutes: 20
+
+# Docker disabled for testing - tests only, no image push
+docker:
+  enabled: false
+  image_name: uta-backend-testing
+
+# Monorepo Configuration
+# uta-backend is a NestJS monorepo with apps/ directory structure
+monorepo:
+  enabled: true
+  apps_path: "apps"
+  libs_path: "libs"
+  # List of apps that can be built (excludes test apps, playgrounds)
+  buildable_apps:
+    - api
+    - wallet
+    - notifications
+    - scheduler
+    - admin
+    - webhooks
+    - worker
+  # Apps excluded from builds (test utilities, playgrounds)
+  excluded_apps:
+    - playground
+    - stories
+    - e2e
+
+# Feature flags
+features:
+  dependency_submission: false
+  auto_deploy: false
+
+# Required secrets (reference only)
+secrets:
+  - GCP_PROJECT_ID
+  - GLOBAL_GCP_SERVICE_ACCOUNT
+  - GLOBAL_GCP_WORKLOAD_IDENTITY_PROVIDER
+
+# Version bump disabled for all environments in testing
+environments:
+  develop:
+    version_bump:
+      enabled: false
+  staging:
+    version_bump:
+      enabled: false
+  master:
+    version_bump:
+      enabled: false

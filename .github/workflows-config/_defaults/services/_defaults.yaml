@@ -1,0 +1,95 @@
+# UTA Testing Project - Service Defaults
+# This file defines project-level defaults for all UTA testing services
+# Testing mode: No artifacts published, tests only
+
+# Project identification
+project_id: uta-testing
+display_name: UTA Testing
+branch_suffix: "-testing"
+
+# Branch mappings
+branches:
+  develop: develop-testing
+  staging: staging-testing
+  master: master-testing
+
+# Git tag prefix for versioning
+git_tag_prefix: "uta-testing@"
+
+# GCP Configuration
+gcp:
+  project_id: zerohub-core-0
+  region: europe-west4
+  workload_identity_provider: "projects/123456789/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+  service_account: "github-actions@zerohub-core-0.iam.gserviceaccount.com"
+
+# Docker Registry Configuration
+# GitHub CI testing uses github-testing-* registries (isolated from ACT local testing)
+# Note: Registries defined for reference only - testing mode skips artifact publishing
+docker:
+  registry_host: europe-west4-docker.pkg.dev
+  repository: github-testing-cr
+  enabled: false  # Testing mode disables Docker publishing
+
+# Maven Repository Configuration (for Gradle services)
+# GitHub CI testing uses github-testing-* registries (isolated from ACT local testing)
+maven:
+  pull_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
+  release_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
+  snapshot_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
+
+# NPM Registry Configuration (for Node.js services)
+# GitHub CI testing uses github-testing-* registries (isolated from ACT local testing)
+npm:
+  scope: "@ut"
+  registries:
+    - project_id: zerohub-core-0
+      region: europe-west4
+      repository: github-testing-npm
+      scope: "@ut"
+
+# Build defaults
+build:
+  timeout_minutes: 20
+  skip_tests: false
+
+# Concurrency settings
+concurrency:
+  cancel_in_progress: true
+
+# Runner configuration
+runs_on: ubuntu-latest
+
+# Permissions
+permissions:
+  contents: read
+  id-token: write
+
+# Feature flags - disabled for testing
+features:
+  dependency_submission: false
+  auto_deploy: false
+  security_scan: false
+
+# Version bump - always disabled for testing
+version_bump:
+  enabled: false
+
+# Artifact retention
+artifacts:
+  retention_days: 3
+
+# Caching
+cache:
+  enabled: true
+
+# Release configuration - disabled for testing
+release:
+  auto_changelog: false
+  version_file: version.json
+
+# Notifications - disabled for testing
+notifications:
+  slack_channel: ""
+  on_failure: false
+  on_release: false

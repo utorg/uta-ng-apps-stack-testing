@@ -1,0 +1,4 @@
+# Staging Environment Defaults - UTA Testing
+# Environment-specific overrides for staging branches
+
+environment: staging

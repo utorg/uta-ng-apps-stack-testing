@@ -1,0 +1,4 @@
+# Production Environment Defaults - UTA Testing
+# Environment-specific overrides for master branches
+
+environment: production
