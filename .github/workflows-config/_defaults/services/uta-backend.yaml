@@ -12,6 +12,10 @@ build:
 docker:
   enabled: false
   image_name: uta-backend-testing
+  # Build args required by docker/actions/app.dockerfile
+  # The 'app' arg is automatically set to the service name for matrix builds
+  build_args:
+    modules: "node:20-alpine"
 
 # Monorepo Configuration
 # uta-backend is a NestJS monorepo with apps/ directory structure
