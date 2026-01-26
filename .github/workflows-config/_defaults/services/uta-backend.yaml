@@ -55,7 +55,9 @@ secrets:
   - GLOBAL_GCP_SERVICE_ACCOUNT
   - GLOBAL_GCP_WORKLOAD_IDENTITY_PROVIDER
 
-# Version bump disabled for all environments in testing
+# Version bump configuration per environment
+# - Enabled only for master (prod) to test full release flow
+# - Disabled for develop/staging to avoid noise
 environments:
   develop:
     version_bump:
@@ -65,4 +67,4 @@ environments:
       enabled: false
   master:
     version_bump:
-      enabled: false
+      enabled: true
