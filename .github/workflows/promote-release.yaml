@@ -84,9 +84,10 @@ jobs:
             fi
           fi
 
-          # Validate version format
-          if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          # Validate version format (allow semver with optional pre-release suffix for testing)
+          if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
             echo "::error::Invalid version format: ${VERSION}"
+            echo "Expected format: X.Y.Z or X.Y.Z-suffix"
             exit 1
           fi
 
