@@ -30,6 +30,7 @@ npm:
 # uta-backend is a NestJS monorepo with apps/ directory structure
 monorepo:
   enabled: true
+  npm: false  # Disable npm plugin - service uses Docker images, not npm packages
   apps_path: "apps"
   libs_path: "libs"
   # List of apps that can be built (must match actual directory names in test repo)
