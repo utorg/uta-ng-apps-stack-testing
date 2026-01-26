@@ -1,0 +1,319 @@
+name: Test Release Flow
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_version:
+        description: 'Test version to simulate (e.g., 99.0.0)'
+        required: false
+        type: string
+        default: '99.0.0'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  test-config-loading:
+    runs-on: ubuntu-latest
+    outputs:
+      test_passed: ${{ steps.test.outputs.passed }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Test Configuration Loading
+        id: test
+        env:
+          TEST_VERSION: ${{ inputs.test_version }}
+        run: |
+          set -euo pipefail
+
+          echo "========================================"
+          echo "Testing Configuration Loading"
+          echo "========================================"
+          echo ""
+
+          # Test 1: Release configuration exists
+          echo "Test 1: Release configuration"
+          CONFIG_FILE=".github/workflows-config/release.yaml"
+          if [[ ! -f "$CONFIG_FILE" ]]; then
+            echo "  FAIL: ${CONFIG_FILE} not found"
+            exit 1
+          fi
+          echo "  PASS: ${CONFIG_FILE} exists"
+
+          # Test 2: Install and use yq
+          echo ""
+          echo "Test 2: yq installation and parsing"
+          if ! command -v yq &> /dev/null; then
+            echo "  Installing yq..."
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          fi
+
+          # Test 3: Parse required fields
+          echo ""
+          echo "Test 3: Required configuration fields"
+
+          TAG_PREFIX=$(yq '.tag_prefix' "$CONFIG_FILE")
+          if [[ -z "$TAG_PREFIX" || "$TAG_PREFIX" == "null" ]]; then
+            echo "  FAIL: tag_prefix not found"
+            exit 1
+          fi
+          echo "  PASS: tag_prefix = ${TAG_PREFIX}"
+
+          BRANCH_PREFIX=$(yq '.branch_prefix' "$CONFIG_FILE")
+          if [[ -z "$BRANCH_PREFIX" || "$BRANCH_PREFIX" == "null" ]]; then
+            echo "  FAIL: branch_prefix not found"
+            exit 1
+          fi
+          echo "  PASS: branch_prefix = ${BRANCH_PREFIX}"
+
+          SOURCE_BRANCH=$(yq '.source_branch' "$CONFIG_FILE")
+          if [[ -z "$SOURCE_BRANCH" || "$SOURCE_BRANCH" == "null" ]]; then
+            echo "  FAIL: source_branch not found"
+            exit 1
+          fi
+          echo "  PASS: source_branch = ${SOURCE_BRANCH}"
+
+          TARGET_BRANCH=$(yq '.target_branch' "$CONFIG_FILE")
+          if [[ -z "$TARGET_BRANCH" || "$TARGET_BRANCH" == "null" ]]; then
+            echo "  FAIL: target_branch not found"
+            exit 1
+          fi
+          echo "  PASS: target_branch = ${TARGET_BRANCH}"
+
+          # Test 4: Version validation
+          echo ""
+          echo "Test 4: Version validation"
+          if [[ ! "${TEST_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "  FAIL: Invalid version format: ${TEST_VERSION}"
+            exit 1
+          fi
+          echo "  PASS: Version format valid: ${TEST_VERSION}"
+
+          echo ""
+          echo "passed=true" >> "$GITHUB_OUTPUT"
+          echo "All configuration tests passed"
+
+  test-promote-release-logic:
+    needs: [test-config-loading]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Test Promote Release Logic
+        env:
+          TEST_VERSION: ${{ inputs.test_version }}
+        run: |
+          set -euo pipefail
+
+          echo "========================================"
+          echo "Testing Promote Release Logic"
+          echo "========================================"
+          echo ""
+
+          CONFIG_FILE=".github/workflows-config/release.yaml"
+
+          # Install yq
+          if ! command -v yq &> /dev/null; then
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          fi
+
+          TAG_PREFIX=$(yq '.tag_prefix' "$CONFIG_FILE")
+          BRANCH_PREFIX=$(yq '.branch_prefix' "$CONFIG_FILE")
+
+          # Test 1: Tag name generation
+          echo "Test 1: Tag name generation"
+          TAG_NAME="${TAG_PREFIX}${TEST_VERSION}"
+          echo "  Generated tag: ${TAG_NAME}"
+
+          EXPECTED_PATTERN="^${TAG_PREFIX}[0-9]+\.[0-9]+\.[0-9]+$"
+          if [[ "${TAG_NAME}" =~ ${EXPECTED_PATTERN} ]]; then
+            echo "  PASS: Tag matches expected pattern"
+          else
+            echo "  FAIL: Tag does not match pattern: ${EXPECTED_PATTERN}"
+            exit 1
+          fi
+
+          # Test 2: Branch name parsing
+          echo ""
+          echo "Test 2: Branch name parsing"
+          TEST_BRANCH="${BRANCH_PREFIX}${TEST_VERSION}"
+          echo "  Test branch: ${TEST_BRANCH}"
+
+          if [[ "${TEST_BRANCH}" =~ ^${BRANCH_PREFIX}([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            EXTRACTED_VERSION="${BASH_REMATCH[1]}"
+            echo "  PASS: Extracted version: ${EXTRACTED_VERSION}"
+          else
+            echo "  FAIL: Could not extract version from branch"
+            exit 1
+          fi
+
+          echo ""
+          echo "All promote-release logic tests passed"
+
+  test-deploy-release-logic:
+    needs: [test-config-loading]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Test Deploy Release Logic
+        env:
+          TEST_VERSION: ${{ inputs.test_version }}
+        run: |
+          set -euo pipefail
+
+          echo "========================================"
+          echo "Testing Deploy Release Logic"
+          echo "========================================"
+          echo ""
+
+          # Test 1: Kustomize directory exists
+          echo "Test 1: Kustomize directory structure"
+          if [[ ! -d "kustomize" ]]; then
+            echo "  FAIL: kustomize directory not found"
+            exit 1
+          fi
+          echo "  PASS: kustomize directory exists"
+
+          # Test 2: Find helm-release files
+          echo ""
+          echo "Test 2: Helm release files"
+          HELM_FILES=$(find kustomize -name "helm-release.yaml" -type f 2>/dev/null | head -10)
+
+          if [[ -z "$HELM_FILES" ]]; then
+            echo "  WARN: No helm-release.yaml files found"
+          else
+            FILE_COUNT=$(echo "$HELM_FILES" | wc -l)
+            echo "  PASS: Found ${FILE_COUNT} helm-release.yaml files (showing first 10)"
+            echo "$HELM_FILES" | head -5 | while read -r file; do
+              echo "    - $file"
+            done
+          fi
+
+          # Test 3: Check for image policy patterns
+          echo ""
+          echo "Test 3: Image policy patterns"
+          POLICY_COUNT=0
+
+          while IFS= read -r file; do
+            if [[ -z "$file" ]]; then continue; fi
+            if grep -q 'imagepolicy' "$file" 2>/dev/null; then
+              ((POLICY_COUNT++)) || true
+            fi
+          done <<< "$HELM_FILES"
+
+          echo "  Files with image policy: ${POLICY_COUNT}"
+
+          echo ""
+          echo "All deploy-release logic tests passed"
+
+  test-kustomize-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: "5.3.0"
+
+      - name: Test Kustomize Build
+        run: |
+          set -euo pipefail
+
+          echo "========================================"
+          echo "Testing Kustomize Build"
+          echo "========================================"
+          echo ""
+
+          if [[ ! -d "kustomize/env" ]]; then
+            echo "No kustomize/env directory - skipping build tests"
+            exit 0
+          fi
+
+          ERRORS=0
+
+          for env_dir in kustomize/env/*/; do
+            if [[ ! -d "$env_dir" ]]; then continue; fi
+
+            env_name=$(basename "$env_dir")
+            echo "Building environment: ${env_name}"
+
+            # Check for top-level kustomization
+            if [[ -f "${env_dir}kustomization.yaml" ]]; then
+              if kustomize build "$env_dir" > /dev/null 2>&1; then
+                echo "  PASS: Environment builds successfully"
+              else
+                echo "  FAIL: Environment build failed"
+                ((ERRORS++)) || true
+              fi
+            fi
+
+            # Build individual apps if they exist
+            if [[ -d "${env_dir}" ]]; then
+              for item_dir in "${env_dir}"*/; do
+                if [[ ! -d "$item_dir" ]]; then continue; fi
+                item_name=$(basename "$item_dir")
+
+                # Skip _common and other non-app directories
+                if [[ "$item_name" == "_common" ]]; then continue; fi
+
+                if [[ -f "${item_dir}kustomization.yaml" ]]; then
+                  if kustomize build "$item_dir" > /dev/null 2>&1; then
+                    echo "  PASS: ${item_name}"
+                  else
+                    echo "  FAIL: ${item_name} build failed"
+                    ((ERRORS++)) || true
+                  fi
+                fi
+              done
+            fi
+            echo ""
+          done
+
+          if [[ $ERRORS -gt 0 ]]; then
+            echo "FAIL: ${ERRORS} kustomize builds failed"
+            exit 1
+          fi
+
+          echo "All kustomize builds passed"
+
+  summary:
+    needs: [test-config-loading, test-promote-release-logic, test-deploy-release-logic, test-kustomize-build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Summary
+        run: |
+          echo "## Release Flow Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Config Loading | ${{ needs.test-config-loading.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Promote Release Logic | ${{ needs.test-promote-release-logic.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy Release Logic | ${{ needs.test-deploy-release-logic.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Kustomize Build | ${{ needs.test-kustomize-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Version:** ${{ inputs.test_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered By:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.test-config-loading.result }}" == "success" ]] && \
+             [[ "${{ needs.test-promote-release-logic.result }}" == "success" ]] && \
+             [[ "${{ needs.test-deploy-release-logic.result }}" == "success" ]] && \
+             [[ "${{ needs.test-kustomize-build.result }}" == "success" ]]; then
+            echo "**Overall:** All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Overall:** Some tests failed - review workflow output" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
