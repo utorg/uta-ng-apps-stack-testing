@@ -1,0 +1,271 @@
+# Promote Release Workflow
+# Creates release tag after PR merge to master-testing
+name: Promote Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master-testing
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+      force:
+        description: 'Force release even without PR context'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  TAG_PREFIX: "uta-testing@"
+  BRANCH_PREFIX: "release-testing/"
+
+jobs:
+  validate:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      is_release: ${{ steps.check.outputs.is_release }}
+      version: ${{ steps.extract.outputs.version }}
+
+    steps:
+      - name: Check for release label (PR trigger)
+        id: check
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+
+          LABELS='${{ toJson(github.event.pull_request.labels.*.name) }}'
+
+          if echo "$LABELS" | grep -q '"release"'; then
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+            echo "PR has 'release' label - proceeding with release promotion"
+          else
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "PR does not have 'release' label - skipping"
+          fi
+
+      - name: Check for manual trigger
+        id: check-manual
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "is_release=true" >> "$GITHUB_OUTPUT"
+          echo "Manual trigger - proceeding with release promotion"
+
+      - name: Extract version from branch (PR trigger)
+        id: extract
+        if: (github.event_name == 'pull_request' && steps.check.outputs.is_release == 'true') || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.version }}"
+            echo "Manual version: ${VERSION}"
+          else
+            HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
+            echo "PR merged from branch: ${HEAD_BRANCH}"
+
+            # Extract version from branch name (release-testing/X.Y.Z)
+            if [[ "${HEAD_BRANCH}" =~ ^${BRANCH_PREFIX}([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+              VERSION="${BASH_REMATCH[1]}"
+              echo "Extracted version: ${VERSION}"
+            else
+              echo "::error::Cannot extract version from branch: ${HEAD_BRANCH}"
+              echo "Expected format: ${BRANCH_PREFIX}<semver>"
+              exit 1
+            fi
+          fi
+
+          # Validate version format
+          if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format: ${VERSION}"
+            exit 1
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+  create-release:
+    needs: [validate]
+    if: needs.validate.outputs.is_release == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    outputs:
+      tag_name: ${{ steps.tag.outputs.tag_name }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: master-testing
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get PR body for changelog (PR trigger)
+        id: pr
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            core.setOutput('body', prBody);
+
+      - name: Create Release Tag
+        id: tag
+        env:
+          VERSION: ${{ needs.validate.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${TAG_PREFIX}${VERSION}"
+
+          # Check if tag already exists
+          if git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG_NAME} already exists"
+            exit 1
+          fi
+
+          # Create annotated tag
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git tag -a "${TAG_NAME}" -m "Release ${VERSION}
+
+          Released from PR #${{ github.event.pull_request.number }}
+          Merged by: ${{ github.event.pull_request.merged_by.login }}"
+          else
+            git tag -a "${TAG_NAME}" -m "Release ${VERSION}
+
+          Manual release by: ${{ github.actor }}
+          Run: ${{ github.run_id }}"
+          fi
+
+          # Push tag
+          git push origin "${TAG_NAME}"
+
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "Created and pushed tag: ${TAG_NAME}"
+
+      - name: Update Changelog
+        env:
+          VERSION: ${{ needs.validate.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          CHANGELOG_FILE="CHANGELOG.md"
+
+          # Create changelog if it doesn't exist
+          if [[ ! -f "$CHANGELOG_FILE" ]]; then
+            echo "# Changelog" > "$CHANGELOG_FILE"
+            echo "" >> "$CHANGELOG_FILE"
+          fi
+
+          # Prepare release entry
+          RELEASE_DATE=$(date -u +"%Y-%m-%d")
+
+          # Get PR body if available
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PR_BODY='${{ steps.pr.outputs.body }}'
+            PR_NUM="${{ github.event.pull_request.number }}"
+          else
+            PR_BODY="Manual release"
+            PR_NUM="N/A"
+          fi
+
+          # Insert new release at top (after header)
+          {
+            head -n 2 "$CHANGELOG_FILE"
+            echo "## [${VERSION}] - ${RELEASE_DATE}"
+            echo ""
+            echo "PR #${PR_NUM}"
+            echo ""
+            # Extract changelog section from PR body if present
+            if [[ -n "$PR_BODY" && "$PR_BODY" != "Manual release" ]]; then
+              echo "$PR_BODY" | sed -n '/## What/,/---/p' | head -n -1 || true
+            else
+              echo "Manual release"
+            fi
+            echo ""
+            tail -n +3 "$CHANGELOG_FILE"
+          } > "${CHANGELOG_FILE}.new"
+
+          mv "${CHANGELOG_FILE}.new" "$CHANGELOG_FILE"
+
+          # Commit changelog with skip-ci
+          git add "$CHANGELOG_FILE"
+          git commit -m "docs: update changelog for ${VERSION} [skip ci]" || echo "No changelog changes to commit"
+          git push origin master-testing || echo "No changes to push"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag_name }}
+          name: "Release ${{ needs.validate.outputs.version }}"
+          body: |
+            ## Release ${{ needs.validate.outputs.version }}
+
+            ${{ github.event_name == 'pull_request' && steps.pr.outputs.body || 'Manual release' }}
+
+            ---
+            **Event:** ${{ github.event_name }}
+            ${{ github.event_name == 'pull_request' && format('**PR:** #{0}', github.event.pull_request.number) || '' }}
+            ${{ github.event_name == 'pull_request' && format('**Merged by:** {0}', github.event.pull_request.merged_by.login) || format('**Triggered by:** {0}', github.actor) }}
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+
+  summary:
+    needs: [validate, create-release]
+    runs-on: ubuntu-latest
+    if: always() && (needs.validate.outputs.is_release == 'true' || github.event_name == 'workflow_dispatch')
+
+    steps:
+      - name: Release Promotion Summary
+        run: |
+          echo "## Release Promotion Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ needs.validate.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tag | ${{ needs.create-release.outputs.tag_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Event | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "| PR | #${{ github.event.pull_request.number }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| Merged By | ${{ github.event.pull_request.merged_by.login }} |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Triggered By | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release Created Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The release tag \`${{ needs.create-release.outputs.tag_name }}\` has been created." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "FluxCD will automatically deploy the release to production based on the tag." >> $GITHUB_STEP_SUMMARY
+
+  skip-summary:
+    needs: [validate]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && needs.validate.outputs.is_release == 'false'
+
+    steps:
+      - name: Skipped Summary
+        run: |
+          echo "## Promote Release Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "PR #${{ github.event.pull_request.number }} was merged but does not have the **release** label." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Only PRs with the 'release' label trigger release promotion." >> $GITHUB_STEP_SUMMARY

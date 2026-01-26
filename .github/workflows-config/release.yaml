@@ -1,0 +1,65 @@
+# Release Configuration for UTA Testing
+# This file defines release workflow settings for the uta-testing project
+
+# Project identification
+project: uta-testing
+
+# Versioning strategy
+versioning:
+  strategy: conventional-commits
+  tag_prefix: "uta-testing@"
+  pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+
+# Changelog generation
+changelog:
+  generate: false  # Disabled for testing
+  template: keepachangelog
+  commit_types:
+    feat: Features
+    fix: Bug Fixes
+    docs: Documentation
+    style: Styles
+    refactor: Code Refactoring
+    perf: Performance Improvements
+    test: Tests
+    build: Build System
+    ci: CI/CD
+    chore: Chores
+    revert: Reverts
+
+# Branch configuration
+branches:
+  source: staging-testing
+  target: master-testing
+  release_branch_prefix: "release-testing/"
+
+# Services included in releases (UTA monorepo apps)
+services:
+  - name: api
+    image: uta-backend-testing-api
+    repo: uta-backend-testing
+  - name: notifications
+    image: uta-backend-testing-notifications
+    repo: uta-backend-testing
+  - name: rates
+    image: uta-backend-testing-rates
+    repo: uta-backend-testing
+
+# PR configuration
+pull_request:
+  labels:
+    - release
+  reviewers: []  # No reviewers for testing
+  draft: false
+
+# GitHub Release configuration
+github_release:
+  enabled: false  # Disabled for testing
+  generate_notes: true
+  prerelease: false
+
+# Notifications - disabled for testing
+notifications:
+  slack:
+    enabled: false
+    channel: ""
