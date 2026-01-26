@@ -23,12 +23,8 @@ gcp:
   service_account: "github-actions@zerohub-core-0.iam.gserviceaccount.com"
 
 # Maven Repository Configuration
-# GitHub CI testing uses github-testing-* registries (isolated from ACT local testing)
-maven:
-  testing:
-    pull_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
-    release_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
-    snapshot_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
+# Registry URLs are specified in environment-specific configs (envs/*/)
+maven: {}
 
 # Runner configuration
 runs_on: ubuntu-latest

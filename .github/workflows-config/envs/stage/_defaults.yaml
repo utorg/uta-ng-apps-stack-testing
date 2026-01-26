@@ -2,3 +2,23 @@
 # Environment-specific overrides for staging branches
 
 environment: staging
+
+# Docker publishing
+docker:
+  enabled: false
+  push: false
+  repository: github-testing-stage-cr
+
+# Maven Repository Configuration (Staging)
+maven:
+  pull_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-stage-mvn"
+  release_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-stage-mvn"
+  snapshot_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-stage-mvn"
+
+# NPM Registry Configuration (Staging)
+npm:
+  scope: "@ut"
+  registries:
+    - project_id: zerohub-core-0
+      region: europe-west4
+      repository: github-testing-stage-npm
