@@ -24,29 +24,22 @@ gcp:
   service_account: "github-actions@zerohub-core-0.iam.gserviceaccount.com"
 
 # Docker Registry Configuration
-# GitHub CI testing uses github-testing-* registries (isolated from ACT local testing)
-# Note: Registries defined for reference only - testing mode skips artifact publishing
+# Registry URLs are specified in environment-specific configs (envs/*/):
+#   - envs/dev/_defaults.yaml: github-testing-dev-cr
+#   - envs/stage/_defaults.yaml: github-testing-stage-cr
+#   - envs/prod/_defaults.yaml: github-testing-prod-cr
 docker:
   registry_host: europe-west4-docker.pkg.dev
-  repository: github-testing-cr
   enabled: false  # Testing mode disables Docker publishing
 
-# Maven Repository Configuration (for Gradle services)
-# GitHub CI testing uses github-testing-* registries (isolated from ACT local testing)
-maven:
-  pull_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
-  release_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
-  snapshot_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-mvn"
+# Maven Repository Configuration
+# Registry URLs are specified in environment-specific configs (envs/*/)
+maven: {}
 
-# NPM Registry Configuration (for Node.js services)
-# GitHub CI testing uses github-testing-* registries (isolated from ACT local testing)
+# NPM Registry Configuration
+# Registry URLs are specified in environment-specific configs (envs/*/)
 npm:
   scope: "@ut"
-  registries:
-    - project_id: zerohub-core-0
-      region: europe-west4
-      repository: github-testing-npm
-      scope: "@ut"
 
 # Build defaults
 build:

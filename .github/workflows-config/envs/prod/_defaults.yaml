@@ -2,3 +2,23 @@
 # Environment-specific overrides for master branches
 
 environment: production
+
+# Docker publishing
+docker:
+  enabled: false
+  push: false
+  repository: github-testing-prod-cr
+
+# Maven Repository Configuration (Production)
+maven:
+  pull_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-prod-mvn"
+  release_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-prod-mvn"
+  snapshot_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-prod-mvn"
+
+# NPM Registry Configuration (Production)
+npm:
+  scope: "@ut"
+  registries:
+    - project_id: zerohub-core-0
+      region: europe-west4
+      repository: github-testing-prod-npm

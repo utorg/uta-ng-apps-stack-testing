@@ -2,3 +2,23 @@
 # Environment-specific overrides for develop branches
 
 environment: develop
+
+# Docker publishing
+docker:
+  enabled: false
+  push: false
+  repository: github-testing-dev-cr
+
+# Maven Repository Configuration (Development)
+maven:
+  pull_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-dev-mvn"
+  release_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-dev-mvn"
+  snapshot_repo_url: "artifactregistry://europe-west4-maven.pkg.dev/zerohub-core-0/github-testing-dev-mvn"
+
+# NPM Registry Configuration (Development)
+npm:
+  scope: "@ut"
+  registries:
+    - project_id: zerohub-core-0
+      region: europe-west4
+      repository: github-testing-dev-npm
