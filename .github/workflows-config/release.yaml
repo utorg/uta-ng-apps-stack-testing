@@ -8,7 +8,7 @@ project: uta-testing
 tag_prefix: "uta-testing@"
 branch_prefix: "release-testing/"
 source_branch: staging-testing
-target_branch: master
+target_branch: master-testing
 
 # Versioning strategy
 versioning:
@@ -36,7 +36,7 @@ changelog:
 # Branch configuration
 branches:
   source: staging-testing
-  target: master
+  target: master-testing
   release_branch_prefix: "release-testing/"
 
 # Services included in releases (UTA monorepo apps)
