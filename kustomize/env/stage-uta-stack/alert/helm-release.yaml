@@ -32,7 +32,7 @@ spec:
         TYPEORM_MIGRATIONS: "true"
         POSTGRES_DATABASE: uta_alert
       image:
-        tag: "1.1.0" # {"$imagepolicy": "apps:alert-image-policy:tag"}
+        tag: "0.4.0" # {"$imagepolicy": "apps:alert-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
