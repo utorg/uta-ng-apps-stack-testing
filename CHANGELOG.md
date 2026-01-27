@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.0] - 2026-01-27
+
+PR #3
+
+## What's Changed
+
+### Bug Fixes
+- fix: SRE-631 escape PR body via env var to prevent shell syntax errors
+
+
 ## [2.0.0] - 2026-01-27
 
 PR #N/A
