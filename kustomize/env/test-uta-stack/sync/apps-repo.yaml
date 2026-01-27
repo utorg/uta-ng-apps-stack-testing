@@ -7,6 +7,6 @@ spec:
   interval: 5m
   url: https://github.com/utorg/uta-ng-apps-stack-testing
   ref:
-    tag: release@0.3.0
+    tag: release@0.4.0
   secretRef:
     name: github-deploy-key
