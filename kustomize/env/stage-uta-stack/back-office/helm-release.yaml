@@ -29,7 +29,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=1600"
         TYPEORM_SYNCHRONIZE: "false"
       image:
-        tag: "2.0.0" # {"$imagepolicy": "apps:back-office-image-policy:tag"}
+        tag: "0.3.0" # {"$imagepolicy": "apps:back-office-image-policy:tag"}
       resources:
         requests:
           cpu: "100m"

@@ -26,7 +26,7 @@ spec:
         JAEGER_PROPAGATION: "jaeger,b3,w3c"
       image:
         name: uta-bo-frontend
-        tag: "2.0.0" # {"$imagepolicy": "apps:back-office-front-image-policy:tag"}
+        tag: "0.3.0" # {"$imagepolicy": "apps:back-office-front-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"
