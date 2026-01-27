@@ -1,0 +1,391 @@
+# Prepare Release Workflow for UTA Config Stack
+# Creates release branch and PR from staging-testing to master
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (leave empty for auto-detection from conventional commits)'
+        required: false
+        type: string
+        default: ''
+      dry_run:
+        description: 'Dry run mode - validate without making changes'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  SOURCE_BRANCH: staging-testing
+  TARGET_BRANCH: master
+  TAG_PREFIX: "uta-testing@"
+  BRANCH_PREFIX: "release-testing/"
+
+jobs:
+  prepare:
+    if: github.ref_name == 'staging-testing'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    outputs:
+      release_branch: ${{ steps.create-release-branch.outputs.release_branch }}
+      version: ${{ steps.version.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+      bump_type: ${{ steps.version.outputs.bump_type }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          clean: true
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+
+      - name: Validate Branch
+        run: |
+          set -euo pipefail
+
+          CURRENT_BRANCH="${{ github.ref_name }}"
+
+          if [[ "${CURRENT_BRANCH}" != "$SOURCE_BRANCH" ]]; then
+            echo "::error::This workflow must be run from the $SOURCE_BRANCH branch"
+            echo "Current branch: ${CURRENT_BRANCH}"
+            exit 1
+          fi
+
+          echo "Branch validation passed"
+
+      - name: Get Latest Release Tag
+        id: latest
+        run: |
+          set -euo pipefail
+
+          # Find latest release tag
+          LATEST_TAG=$(git tag -l "${TAG_PREFIX}*" --sort=-v:refname | head -1 || echo "")
+
+          if [[ -z "$LATEST_TAG" ]]; then
+            echo "No existing release tags found"
+            LATEST_VERSION="0.0.0"
+            COMMIT_RANGE="HEAD~20..HEAD"  # Last 20 commits for first release
+          else
+            LATEST_VERSION="${LATEST_TAG#${TAG_PREFIX}}"
+            COMMIT_RANGE="${LATEST_TAG}..HEAD"
+            echo "Latest release: ${LATEST_TAG} (version: ${LATEST_VERSION})"
+          fi
+
+          echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
+          echo "latest_version=${LATEST_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "commit_range=${COMMIT_RANGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Analyze Commits for Version Bump
+        id: analyze
+        run: |
+          set -euo pipefail
+
+          COMMIT_RANGE="${{ steps.latest.outputs.commit_range }}"
+
+          # Count commit types using conventional commits
+          BREAKING_COUNT=0
+          FEAT_COUNT=0
+          FIX_COUNT=0
+
+          while IFS= read -r commit; do
+            [[ -z "$commit" ]] && continue
+
+            # Check for breaking changes
+            if [[ "$commit" =~ ^.*!: ]] || [[ "$commit" =~ BREAKING\ CHANGE ]]; then
+              ((BREAKING_COUNT++)) || true
+            elif [[ "$commit" =~ ^feat ]]; then
+              ((FEAT_COUNT++)) || true
+            elif [[ "$commit" =~ ^fix ]]; then
+              ((FIX_COUNT++)) || true
+            fi
+          done < <(git log --oneline --format="%s" ${COMMIT_RANGE} 2>/dev/null || true)
+
+          echo "Commit analysis:"
+          echo "  Breaking changes: ${BREAKING_COUNT}"
+          echo "  Features: ${FEAT_COUNT}"
+          echo "  Fixes: ${FIX_COUNT}"
+
+          # Determine bump type
+          if [[ $BREAKING_COUNT -gt 0 ]]; then
+            BUMP_TYPE="major"
+          elif [[ $FEAT_COUNT -gt 0 ]]; then
+            BUMP_TYPE="minor"
+          else
+            BUMP_TYPE="patch"
+          fi
+
+          echo "bump_type=${BUMP_TYPE}" >> "$GITHUB_OUTPUT"
+          echo "breaking_count=${BREAKING_COUNT}" >> "$GITHUB_OUTPUT"
+          echo "feat_count=${FEAT_COUNT}" >> "$GITHUB_OUTPUT"
+          echo "fix_count=${FIX_COUNT}" >> "$GITHUB_OUTPUT"
+
+          echo "Recommended bump type: ${BUMP_TYPE}"
+
+      - name: Calculate Version
+        id: version
+        run: |
+          set -euo pipefail
+
+          INPUT_VERSION="${{ inputs.version }}"
+          LATEST_VERSION="${{ steps.latest.outputs.latest_version }}"
+          BUMP_TYPE="${{ steps.analyze.outputs.bump_type }}"
+
+          if [[ -n "$INPUT_VERSION" ]]; then
+            # Use provided version
+            VERSION="$INPUT_VERSION"
+            echo "Using provided version: ${VERSION}"
+          else
+            # Auto-calculate based on conventional commits
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_VERSION"
+
+            case "$BUMP_TYPE" in
+              major)
+                MAJOR=$((MAJOR + 1))
+                MINOR=0
+                PATCH=0
+                ;;
+              minor)
+                MINOR=$((MINOR + 1))
+                PATCH=0
+                ;;
+              patch)
+                PATCH=$((PATCH + 1))
+                ;;
+            esac
+
+            VERSION="${MAJOR}.${MINOR}.${PATCH}"
+            echo "Auto-calculated version: ${VERSION} (${BUMP_TYPE} bump)"
+          fi
+
+          # Validate format
+          if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format: ${VERSION}"
+            exit 1
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "bump_type=${BUMP_TYPE}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          set -euo pipefail
+
+          COMMIT_RANGE="${{ steps.latest.outputs.commit_range }}"
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Generate changelog content
+          cat > /tmp/changelog.md << 'EOF'
+          ## What's Changed
+          EOF
+
+          # Breaking changes
+          BREAKING=$(git log --oneline --format="- %s" ${COMMIT_RANGE} 2>/dev/null | grep -E "^- .*!:" || true)
+          if [[ -n "$BREAKING" ]]; then
+            echo "" >> /tmp/changelog.md
+            echo "### Breaking Changes" >> /tmp/changelog.md
+            echo "$BREAKING" >> /tmp/changelog.md
+          fi
+
+          # Features
+          FEATURES=$(git log --oneline --format="- %s" ${COMMIT_RANGE} 2>/dev/null | grep -E "^- feat" || true)
+          if [[ -n "$FEATURES" ]]; then
+            echo "" >> /tmp/changelog.md
+            echo "### Features" >> /tmp/changelog.md
+            echo "$FEATURES" >> /tmp/changelog.md
+          fi
+
+          # Fixes
+          FIXES=$(git log --oneline --format="- %s" ${COMMIT_RANGE} 2>/dev/null | grep -E "^- fix" || true)
+          if [[ -n "$FIXES" ]]; then
+            echo "" >> /tmp/changelog.md
+            echo "### Bug Fixes" >> /tmp/changelog.md
+            echo "$FIXES" >> /tmp/changelog.md
+          fi
+
+          # Other changes
+          OTHER=$(git log --oneline --format="- %s" ${COMMIT_RANGE} 2>/dev/null | grep -vE "^- (feat|fix|.*!:)" || true)
+          if [[ -n "$OTHER" ]]; then
+            echo "" >> /tmp/changelog.md
+            echo "### Other Changes" >> /tmp/changelog.md
+            echo "$OTHER" >> /tmp/changelog.md
+          fi
+
+          # Commit summary
+          COMMIT_COUNT=$(git rev-list --count ${COMMIT_RANGE} 2>/dev/null || echo "0")
+          echo "" >> /tmp/changelog.md
+          echo "---" >> /tmp/changelog.md
+          echo "**Commits:** ${COMMIT_COUNT}" >> /tmp/changelog.md
+          echo "**Released:** $(date -u +"%Y-%m-%d")" >> /tmp/changelog.md
+
+          # Output changelog (escape for multiline)
+          CHANGELOG=$(cat /tmp/changelog.md)
+          echo "changelog<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$CHANGELOG" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          echo "Generated changelog:"
+          cat /tmp/changelog.md
+
+      - name: Check Existing Tags and Branches
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.version.outputs.version }}"
+
+          TAG_NAME="${TAG_PREFIX}${VERSION}"
+          RELEASE_BRANCH="${BRANCH_PREFIX}${VERSION}"
+
+          echo "Checking for existing tag: ${TAG_NAME}"
+          if git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG_NAME} already exists"
+            exit 1
+          fi
+
+          echo "Checking for existing branch: ${RELEASE_BRANCH}"
+          if git ls-remote --heads origin "${RELEASE_BRANCH}" | grep -q .; then
+            echo "::error::Branch ${RELEASE_BRANCH} already exists"
+            exit 1
+          fi
+
+          echo "Validation passed - tag and branch do not exist"
+
+      - name: Create Release Branch
+        id: create-release-branch
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.version.outputs.version }}"
+          RELEASE_BRANCH="${BRANCH_PREFIX}${VERSION}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            echo "DRY RUN: Would create and push branch ${RELEASE_BRANCH}"
+          else
+            git checkout -b "${RELEASE_BRANCH}"
+            git push origin "${RELEASE_BRANCH}"
+            echo "Created and pushed branch: ${RELEASE_BRANCH}"
+          fi
+
+          echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
+
+  create-pr:
+    needs: [prepare]
+    if: inputs.dry_run != true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request
+        uses: actions/github-script@v7
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          PR_HEAD_BRANCH: ${{ needs.prepare.outputs.release_branch }}
+          PR_BASE_BRANCH: master
+          CHANGELOG: ${{ needs.prepare.outputs.changelog }}
+          BUMP_TYPE: ${{ needs.prepare.outputs.bump_type }}
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            const version = process.env.VERSION;
+            const headBranch = process.env.PR_HEAD_BRANCH;
+            const baseBranch = process.env.PR_BASE_BRANCH;
+            const changelog = process.env.CHANGELOG;
+            const bumpType = process.env.BUMP_TYPE;
+
+            const title = `Release ${version}`;
+            const body = `## Release ${version}
+
+            **Version bump:** ${bumpType}
+
+            ${changelog}
+
+            ### Checklist
+            - [ ] Review changes included in this release
+            - [ ] Verify image references are updated
+            - [ ] Approve and merge to trigger promote-release
+
+            ---
+            *This PR was automatically created by the prepare-release workflow.*`;
+
+            try {
+              const pr = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: headBranch,
+                base: baseBranch,
+                title: title,
+                body: body
+              });
+
+              console.log(`Created PR #${pr.data.number}: ${pr.data.html_url}`);
+
+              // Add labels
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.data.number,
+                labels: ['release', 'automated', bumpType]
+              });
+            } catch (error) {
+              if (error.status === 422 && error.message.includes('A pull request already exists')) {
+                console.log(`PR already exists from ${headBranch} to ${baseBranch}`);
+              } else {
+                throw error;
+              }
+            }
+
+  summary:
+    needs: [prepare]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Release Preparation Summary
+        run: |
+          echo "## Prepare Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ needs.prepare.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bump Type | ${{ needs.prepare.outputs.bump_type }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Release Branch | ${{ needs.prepare.outputs.release_branch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dry Run | ${{ inputs.dry_run }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered By | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            echo "**Dry run completed** - no changes were made." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+            echo "1. Review and approve the PR to master" >> $GITHUB_STEP_SUMMARY
+            echo "2. Merge PR to trigger promote-release" >> $GITHUB_STEP_SUMMARY
+            echo "3. Verify release tag is created" >> $GITHUB_STEP_SUMMARY
+            echo "4. Run deploy-release to update Kustomize image references" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Changelog" >> $GITHUB_STEP_SUMMARY
+          cat << 'CHANGELOG_EOF' >> $GITHUB_STEP_SUMMARY
+          ${{ needs.prepare.outputs.changelog }}
+          CHANGELOG_EOF

@@ -9,10 +9,10 @@ build:
   timeout_minutes: 20
 
 # Docker enabled for testing - images built to testing registry but not deployed
+# NOTE: docker.repository is set in environment-specific configs (envs/*/_defaults.yaml)
 docker:
   enabled: true
   image_name: uta-backend-testing
-  repository: github-testing-cr
   dockerfile: "./docker/actions/app.dockerfile"
   modules_dockerfile: "./docker/actions/modules.dockerfile"
   platforms: "linux/amd64"
@@ -21,17 +21,16 @@ docker:
   build_args:
     modules: "node:20-alpine"
 
-# NPM registry for @ut-libs packages (testing registry)
+# NPM registry for @ut-libs packages
+# NOTE: npm.registries is set in environment-specific configs (envs/*/_defaults.yaml)
 npm:
-  registries:
-    - scope: "@ut-libs"
-      project: "zerohub-core-0"
-      repository: "github-testing-npm"
+  registries: []
 
 # Monorepo Configuration
 # uta-backend is a NestJS monorepo with apps/ directory structure
 monorepo:
   enabled: true
+  npm: false  # Disable npm plugin - service uses Docker images, not npm packages
   apps_path: "apps"
   libs_path: "libs"
   # List of apps that can be built (must match actual directory names in test repo)
@@ -57,7 +56,9 @@ secrets:
   - GLOBAL_GCP_SERVICE_ACCOUNT
   - GLOBAL_GCP_WORKLOAD_IDENTITY_PROVIDER
 
-# Version bump disabled for all environments in testing
+# Version bump configuration per environment
+# - Enabled only for master (prod) to test full release flow
+# - Disabled for develop/staging to avoid noise
 environments:
   develop:
     version_bump:
@@ -67,4 +68,4 @@ environments:
       enabled: false
   master:
     version_bump:
-      enabled: false
+      enabled: true

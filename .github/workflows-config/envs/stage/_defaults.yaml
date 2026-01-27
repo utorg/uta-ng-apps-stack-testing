@@ -19,6 +19,12 @@ maven:
 npm:
   scope: "@ut"
   registries:
-    - project_id: zerohub-core-0
+    - scope: "@ut"
+      project_id: zerohub-core-0
       region: europe-west4
       repository: github-testing-stage-npm
+    # @ut-libs packages are shared dependencies - pull from shared registry
+    - scope: "@ut-libs"
+      project_id: zerohub-core-0
+      region: europe-west4
+      repository: github-testing-npm

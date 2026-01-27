@@ -1,0 +1,241 @@
+# Deploy Release Workflow
+# Updates helm-release files with release version tags
+name: Deploy Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode - validate without making changes'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-master-testing
+  cancel-in-progress: false
+
+jobs:
+  validate-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      tag_name: ${{ steps.validate.outputs.tag_name }}
+      tag_prefix: ${{ steps.config.outputs.tag_prefix }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Load Release Configuration
+        id: config
+        run: |
+          set -euo pipefail
+
+          CONFIG_FILE=".github/workflows-config/release.yaml"
+          if [[ ! -f "$CONFIG_FILE" ]]; then
+            echo "::error::Release configuration not found at ${CONFIG_FILE}"
+            exit 1
+          fi
+
+          # Install yq if needed
+          if ! command -v yq &> /dev/null; then
+            echo "Installing yq..."
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          fi
+
+          TAG_PREFIX=$(yq '.tag_prefix // "release@"' "$CONFIG_FILE")
+          TARGET_BRANCH=$(yq '.target_branch // "master"' "$CONFIG_FILE")
+
+          echo "tag_prefix=${TAG_PREFIX}" >> "$GITHUB_OUTPUT"
+          echo "target_branch=${TARGET_BRANCH}" >> "$GITHUB_OUTPUT"
+
+          echo "Loaded config from ${CONFIG_FILE}"
+          echo "  Tag prefix: ${TAG_PREFIX}"
+          echo "  Target branch: ${TARGET_BRANCH}"
+
+      - name: Validate Tag and Extract Version
+        id: validate
+        env:
+          TAG_PREFIX: ${{ steps.config.outputs.tag_prefix }}
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${{ github.ref_name }}"
+          echo "Validating tag: ${TAG_NAME}"
+
+          # Validate tag format (e.g., uta-testing@X.Y.Z)
+          EXPECTED_PATTERN="^${TAG_PREFIX}[0-9]+\.[0-9]+\.[0-9]+$"
+
+          if [[ ! "${TAG_NAME}" =~ ${EXPECTED_PATTERN} ]]; then
+            echo "::error::Invalid tag format: ${TAG_NAME}"
+            echo "::error::Expected format: ${TAG_PREFIX}X.Y.Z (e.g., ${TAG_PREFIX}1.2.3)"
+            echo "::error::Please trigger this workflow by selecting a release tag"
+            exit 1
+          fi
+
+          # Extract version by removing tag prefix
+          VERSION="${TAG_NAME#${TAG_PREFIX}}"
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "Tag validated: ${TAG_NAME}"
+          echo "Version extracted: ${VERSION}"
+
+  update-helm-releases:
+    needs: [validate-version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout Target Branch
+        uses: actions/checkout@v4
+        with:
+          ref: master-testing
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify Release Tag Exists
+        env:
+          TAG_NAME: ${{ needs.validate-version.outputs.tag_name }}
+        run: |
+          set -euo pipefail
+
+          echo "Verifying tag exists: ${TAG_NAME}"
+
+          # Fetch all tags
+          git fetch --tags
+
+          # Check if tag exists
+          if ! git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG_NAME} does not exist in the repository"
+            echo "::error::Please ensure the release PR has been merged and the promote-release workflow has completed"
+            exit 1
+          fi
+
+          echo "Tag ${TAG_NAME} exists"
+
+      - name: Find and Update Helm Release Files
+        id: update
+        env:
+          VERSION: ${{ needs.validate-version.outputs.version }}
+          TAG_NAME: ${{ needs.validate-version.outputs.tag_name }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          echo "Searching for helm-release.yaml files..."
+
+          # Find all helm-release files in kustomize directories
+          HELM_FILES=$(find kustomize -name "helm-release.yaml" -type f 2>/dev/null || true)
+
+          if [[ -z "$HELM_FILES" ]]; then
+            echo "::warning::No helm-release.yaml files found"
+            echo "files_updated=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          FILES_UPDATED=0
+          FILES_LIST=""
+
+          while IFS= read -r file; do
+            if [[ -z "$file" ]]; then
+              continue
+            fi
+
+            # Check if file contains image tag pattern
+            if grep -q 'tag:.*imagepolicy' "$file" 2>/dev/null; then
+              echo "Found file with image policy: $file"
+
+              if [[ "${DRY_RUN}" == "true" ]]; then
+                echo "  DRY RUN: Would update tag to ${VERSION}"
+                # Show what would change
+                grep -n 'tag:.*imagepolicy' "$file" || true
+              else
+                # Update image tags - preserve the imagepolicy comment
+                # Pattern: tag: "X.Y.Z" # {"$imagepolicy": "..."}
+                sed -i -E "s/(tag: \")[^\"]+(\".*)(\{\"\\\$imagepolicy\")/\1${VERSION}\2\3/g" "$file"
+
+                if git diff --quiet "$file"; then
+                  echo "  No changes needed (already at version ${VERSION})"
+                else
+                  echo "  Updated to version ${VERSION}"
+                  ((FILES_UPDATED++)) || true
+                  FILES_LIST="${FILES_LIST}${file}\n"
+                fi
+              fi
+            fi
+          done <<< "$HELM_FILES"
+
+          echo "files_updated=${FILES_UPDATED}" >> "$GITHUB_OUTPUT"
+          echo "files_list<<EOF" >> "$GITHUB_OUTPUT"
+          echo -e "${FILES_LIST}" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          echo ""
+          echo "Files updated: ${FILES_UPDATED}"
+
+      - name: Commit and Push Changes
+        if: inputs.dry_run != true && steps.update.outputs.files_updated != '0'
+        env:
+          VERSION: ${{ needs.validate-version.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          COMMIT_MSG="chore: deploy release ${VERSION} to production"
+
+          git add kustomize/
+          git commit -m "${COMMIT_MSG}"
+          git push origin master-testing
+
+          echo "Successfully committed and pushed helm-release updates"
+
+      - name: Generate Step Summary
+        env:
+          VERSION: ${{ needs.validate-version.outputs.version }}
+          TAG_NAME: ${{ needs.validate-version.outputs.tag_name }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          FILES_UPDATED: ${{ steps.update.outputs.files_updated }}
+          FILES_LIST: ${{ steps.update.outputs.files_list }}
+        run: |
+          echo "## Deploy Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            echo "**Mode:** Dry Run (no changes made)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Mode:** Live Deployment" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${VERSION} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tag | ${TAG_NAME} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | master-testing |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered By | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Files Updated | ${FILES_UPDATED} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ -n "${FILES_LIST}" ]]; then
+            echo "### Updated Files" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo -e "${FILES_LIST}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            echo "**Next Steps:** Run without dry_run to apply changes" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Next Steps:** FluxCD will automatically sync the updated image tags" >> $GITHUB_STEP_SUMMARY
+          fi
