@@ -162,6 +162,8 @@ jobs:
       - name: Update Changelog
         env:
           VERSION: ${{ needs.validate.outputs.version }}
+          PR_BODY: ${{ github.event_name == 'pull_request' && steps.pr.outputs.body || 'Manual release' }}
+          PR_NUM: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'N/A' }}
         run: |
           set -euo pipefail
 
@@ -175,15 +177,6 @@ jobs:
 
           # Prepare release entry
           RELEASE_DATE=$(date -u +"%Y-%m-%d")
-
-          # Get PR body if available
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            PR_BODY='${{ steps.pr.outputs.body }}'
-            PR_NUM="${{ github.event.pull_request.number }}"
-          else
-            PR_BODY="Manual release"
-            PR_NUM="N/A"
-          fi
 
           # Insert new release at top (after header)
           {
