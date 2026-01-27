@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.0] - 2026-01-27
+
+PR #N/A
+
+Manual release
+
 ## [1.1.0] - 2026-01-27
 
 PR #N/A
