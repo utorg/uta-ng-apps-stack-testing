@@ -68,7 +68,8 @@ jobs:
           BRANCH_PREFIX=$(yq '.branch_prefix // "release/"' "$CONFIG_FILE")
           SOURCE_BRANCH=$(yq '.source_branch // "master"' "$CONFIG_FILE")
           TARGET_BRANCH=$(yq '.target_branch // "production"' "$CONFIG_FILE")
-          CHANGELOG_ENABLED=$(yq '.changelog.generate // true' "$CONFIG_FILE")
+          # Note: Don't use // (alternative) for booleans - yq treats 'false' as falsy
+          CHANGELOG_ENABLED=$(yq 'if .changelog.generate == null then "true" else .changelog.generate end' "$CONFIG_FILE")
 
           echo "tag_prefix=${TAG_PREFIX}" >> "${GITHUB_OUTPUT}"
           echo "branch_prefix=${BRANCH_PREFIX}" >> "${GITHUB_OUTPUT}"
