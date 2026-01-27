@@ -1,5 +1,5 @@
 # Prepare Release Workflow for UTA Config Stack
-# Creates release branch and PR from master to production
+# Creates release branch and PR from source to target branch (configurable)
 name: Prepare Release
 
 on:
@@ -22,7 +22,6 @@ concurrency:
 
 jobs:
   prepare:
-    if: github.ref_name == 'master'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -34,6 +33,7 @@ jobs:
       changelog: ${{ steps.changelog.outputs.changelog || steps.skip-changelog.outputs.changelog }}
       bump_type: ${{ steps.version.outputs.bump_type }}
       changelog_enabled: ${{ steps.config.outputs.changelog_enabled }}
+      target_branch: ${{ steps.config.outputs.target_branch }}
 
     steps:
       - name: Checkout Repository
@@ -351,7 +351,7 @@ jobs:
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
           PR_HEAD_BRANCH: ${{ needs.prepare.outputs.release_branch }}
-          PR_BASE_BRANCH: production
+          PR_BASE_BRANCH: ${{ needs.prepare.outputs.target_branch }}
           CHANGELOG: ${{ needs.prepare.outputs.changelog }}
           BUMP_TYPE: ${{ needs.prepare.outputs.bump_type }}
         with:

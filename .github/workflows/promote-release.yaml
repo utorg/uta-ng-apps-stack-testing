@@ -1,12 +1,12 @@
 # Promote Release Workflow
-# Creates release tag after PR merge to production
+# Creates release tag after PR merge to target branch
 name: Promote Release
 
 on:
   pull_request:
     types: [closed]
     branches:
-      - production
+      - master-testing
 
   workflow_dispatch:
     inputs:
@@ -25,8 +25,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TAG_PREFIX: "release@"
-  BRANCH_PREFIX: "release/"
+  TAG_PREFIX: "uta-testing@"
+  BRANCH_PREFIX: "release-testing/"
 
 jobs:
   validate:
@@ -107,7 +107,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: production
+          ref: master-testing
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
@@ -200,7 +200,7 @@ jobs:
           # Commit changelog with skip-ci
           git add "$CHANGELOG_FILE"
           git commit -m "docs: update changelog for ${VERSION} [skip ci]" || echo "No changelog changes to commit"
-          git push origin production || echo "No changes to push"
+          git push origin master-testing || echo "No changes to push"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

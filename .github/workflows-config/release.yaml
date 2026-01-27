@@ -5,15 +5,15 @@
 project: uta-ng-apps-stack-testing
 
 # Top-level configuration (required by spec)
-tag_prefix: "release@"
-branch_prefix: "release/"
-source_branch: master
-target_branch: production
+tag_prefix: "uta-testing@"
+branch_prefix: "release-testing/"
+source_branch: staging-testing
+target_branch: master-testing
 
 # Versioning strategy
 versioning:
   strategy: conventional-commits
-  tag_prefix: "release@"
+  tag_prefix: "uta-testing@"
   pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
 
 # Changelog generation - disabled for testing repository
@@ -35,9 +35,9 @@ changelog:
 
 # Branch configuration
 branches:
-  source: master
-  target: production
-  release_branch_prefix: "release/"
+  source: staging-testing
+  target: master-testing
+  release_branch_prefix: "release-testing/"
 
 # Services included in releases (UTA monorepo apps)
 services:
