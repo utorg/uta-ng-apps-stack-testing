@@ -24,7 +24,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "2.91.4-3-g08b11fec" # {"$imagepolicy": "apps:swaps-image-policy:tag"}
+        tag: "1.1.0" # {"$imagepolicy": "apps:swaps-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"

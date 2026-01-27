@@ -37,7 +37,7 @@ spec:
         IS_ACTIVITY_MODULE_ENABLED: "true"
         RECEIVER_DISABLED_FORCE: "false"
       image:
-        tag: "2.71.0-31-g189dafb6" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
+        tag: "1.1.0" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
       strategy:
         type: Recreate
       resources:

@@ -34,7 +34,7 @@ spec:
         LOG_LEVEL: info
         NODE_OPTIONS: "--max-old-space-size=3200"
       image:
-        tag: "2.91.0-1-g5fe7cec5" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
+        tag: "1.1.0" # {"$imagepolicy": "apps:blockchain-info-image-policy:tag"}
       strategy:
         type: Recreate
       resources:

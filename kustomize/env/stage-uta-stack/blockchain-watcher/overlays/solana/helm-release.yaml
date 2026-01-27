@@ -11,7 +11,7 @@ spec:
         NODE_OPTIONS: "--max-old-space-size=4800"
       image:
         name: blockchain-watcher
-        tag: "2.91.0-1-g5fe7cec5" # {"$imagepolicy": "apps:blockchain-watcher-solana-image-policy:tag"}
+        tag: "1.1.0" # {"$imagepolicy": "apps:blockchain-watcher-solana-image-policy:tag"}
       resources:
         limits:
           cpu: "3"
