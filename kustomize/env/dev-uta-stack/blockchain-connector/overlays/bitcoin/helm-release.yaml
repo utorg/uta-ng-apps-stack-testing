@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: BITCOIN
       image:
         name: "blockchain-connector"
-        tag: "1.1.0" # {"$imagepolicy": "apps:blockchain-connector-bitcoin-image-policy:tag"}
+        tag: "2.0.0" # {"$imagepolicy": "apps:blockchain-connector-bitcoin-image-policy:tag"}

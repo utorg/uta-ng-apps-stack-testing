@@ -24,7 +24,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "1.1.0" # {"$imagepolicy": "apps:dead-letter-image-policy:tag"}
+        tag: "2.0.0" # {"$imagepolicy": "apps:dead-letter-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"

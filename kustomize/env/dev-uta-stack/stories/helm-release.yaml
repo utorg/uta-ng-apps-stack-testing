@@ -25,7 +25,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "1.1.0" # {"$imagepolicy": "apps:stories-image-policy:tag"}
+        tag: "2.0.0" # {"$imagepolicy": "apps:stories-image-policy:tag"}
       resources:
         limits:
           cpu: "1"
