@@ -20,12 +20,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
-env:
-  SOURCE_BRANCH: master
-  TARGET_BRANCH: production
-  TAG_PREFIX: "release@"
-  BRANCH_PREFIX: "release/"
-
 jobs:
   prepare:
     if: github.ref_name == 'master'
@@ -37,8 +31,9 @@ jobs:
     outputs:
       release_branch: ${{ steps.create-release-branch.outputs.release_branch }}
       version: ${{ steps.version.outputs.version }}
-      changelog: ${{ steps.changelog.outputs.changelog }}
+      changelog: ${{ steps.changelog.outputs.changelog || steps.skip-changelog.outputs.changelog }}
       bump_type: ${{ steps.version.outputs.bump_type }}
+      changelog_enabled: ${{ steps.config.outputs.changelog_enabled }}
 
     steps:
       - name: Checkout Repository
@@ -49,14 +44,54 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
+      - name: Load Release Configuration
+        id: config
+        run: |
+          set -euo pipefail
+
+          echo "Loading release configuration..."
+
+          CONFIG_FILE=".github/workflows-config/release.yaml"
+          if [[ ! -f "$CONFIG_FILE" ]]; then
+            echo "::error::Release configuration not found at ${CONFIG_FILE}"
+            exit 1
+          fi
+
+          # Install yq if needed
+          if ! command -v yq &> /dev/null; then
+            echo "Installing yq..."
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          fi
+
+          TAG_PREFIX=$(yq '.tag_prefix // "release@"' "$CONFIG_FILE")
+          BRANCH_PREFIX=$(yq '.branch_prefix // "release/"' "$CONFIG_FILE")
+          SOURCE_BRANCH=$(yq '.source_branch // "master"' "$CONFIG_FILE")
+          TARGET_BRANCH=$(yq '.target_branch // "production"' "$CONFIG_FILE")
+          CHANGELOG_ENABLED=$(yq '.changelog.generate // true' "$CONFIG_FILE")
+
+          echo "tag_prefix=${TAG_PREFIX}" >> "${GITHUB_OUTPUT}"
+          echo "branch_prefix=${BRANCH_PREFIX}" >> "${GITHUB_OUTPUT}"
+          echo "source_branch=${SOURCE_BRANCH}" >> "${GITHUB_OUTPUT}"
+          echo "target_branch=${TARGET_BRANCH}" >> "${GITHUB_OUTPUT}"
+          echo "changelog_enabled=${CHANGELOG_ENABLED}" >> "${GITHUB_OUTPUT}"
+          echo "config_file=${CONFIG_FILE}" >> "${GITHUB_OUTPUT}"
+
+          echo "Configuration loaded from ${CONFIG_FILE}"
+          echo "  Tag prefix: ${TAG_PREFIX}"
+          echo "  Branch prefix: ${BRANCH_PREFIX}"
+          echo "  Source: ${SOURCE_BRANCH} -> Target: ${TARGET_BRANCH}"
+          echo "  Changelog generation: ${CHANGELOG_ENABLED}"
+
       - name: Validate Branch
         run: |
           set -euo pipefail
 
           CURRENT_BRANCH="${{ github.ref_name }}"
+          SOURCE_BRANCH="${{ steps.config.outputs.source_branch }}"
 
-          if [[ "${CURRENT_BRANCH}" != "$SOURCE_BRANCH" ]]; then
-            echo "::error::This workflow must be run from the $SOURCE_BRANCH branch"
+          if [[ "${CURRENT_BRANCH}" != "${SOURCE_BRANCH}" ]]; then
+            echo "::error::This workflow must be run from the ${SOURCE_BRANCH} branch"
             echo "Current branch: ${CURRENT_BRANCH}"
             exit 1
           fi
@@ -67,6 +102,8 @@ jobs:
         id: latest
         run: |
           set -euo pipefail
+
+          TAG_PREFIX="${{ steps.config.outputs.tag_prefix }}"
 
           # Find latest release tag
           LATEST_TAG=$(git tag -l "${TAG_PREFIX}*" --sort=-v:refname | head -1 || echo "")
@@ -178,6 +215,7 @@ jobs:
 
       - name: Generate Changelog
         id: changelog
+        if: steps.config.outputs.changelog_enabled == 'true'
         run: |
           set -euo pipefail
 
@@ -237,11 +275,20 @@ jobs:
           echo "Generated changelog:"
           cat /tmp/changelog.md
 
+      - name: Skip Changelog Generation
+        id: skip-changelog
+        if: steps.config.outputs.changelog_enabled != 'true'
+        run: |
+          echo "Changelog generation disabled in configuration"
+          echo "changelog=*Changelog generation disabled for testing repository*" >> "$GITHUB_OUTPUT"
+
       - name: Check Existing Tags and Branches
         run: |
           set -euo pipefail
 
           VERSION="${{ steps.version.outputs.version }}"
+          TAG_PREFIX="${{ steps.config.outputs.tag_prefix }}"
+          BRANCH_PREFIX="${{ steps.config.outputs.branch_prefix }}"
 
           TAG_NAME="${TAG_PREFIX}${VERSION}"
           RELEASE_BRANCH="${BRANCH_PREFIX}${VERSION}"
@@ -268,6 +315,7 @@ jobs:
           set -euo pipefail
 
           VERSION="${{ steps.version.outputs.version }}"
+          BRANCH_PREFIX="${{ steps.config.outputs.branch_prefix }}"
           RELEASE_BRANCH="${BRANCH_PREFIX}${VERSION}"
 
           git config user.name "github-actions[bot]"

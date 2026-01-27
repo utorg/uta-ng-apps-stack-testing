@@ -16,9 +16,9 @@ versioning:
   tag_prefix: "release@"
   pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
 
-# Changelog generation
+# Changelog generation - disabled for testing repository
 changelog:
-  generate: true
+  generate: false
   template: keepachangelog
   commit_types:
     feat: Features
