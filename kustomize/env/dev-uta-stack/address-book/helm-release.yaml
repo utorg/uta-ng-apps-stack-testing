@@ -31,7 +31,7 @@ spec:
         TYPEORM_SYNCHRONIZE: "false"
         NODE_OPTIONS: "--max-old-space-size=1600"
       image:
-        tag: "0.3.0" # {"$imagepolicy": "apps:address-book-image-policy:tag"}
+        tag: "0.4.0" # {"$imagepolicy": "apps:address-book-image-policy:tag"}
       resources:
         requests:
           cpu: "10m"

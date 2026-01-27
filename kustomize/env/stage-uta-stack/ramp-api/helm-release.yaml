@@ -25,7 +25,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "0.3.0" # {"$imagepolicy": "apps:ramp-api-image-policy:tag"}
+        tag: "0.4.0" # {"$imagepolicy": "apps:ramp-api-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
