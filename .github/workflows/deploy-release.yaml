@@ -1,5 +1,5 @@
 # Deploy Release Workflow
-# Updates helm-release files with release version tags
+# Updates helm-release files with release version tags and pushes to production branch
 name: Deploy Release
 
 on:
@@ -12,7 +12,7 @@ on:
         default: false
 
 concurrency:
-  group: ${{ github.workflow }}-master-testing
+  group: ${{ github.workflow }}-production
   cancel-in-progress: false
 
 jobs:
@@ -46,8 +46,8 @@ jobs:
             sudo chmod +x /usr/local/bin/yq
           fi
 
-          TAG_PREFIX=$(yq '.tag_prefix // "release@"' "$CONFIG_FILE")
-          TARGET_BRANCH=$(yq '.target_branch // "master"' "$CONFIG_FILE")
+          TAG_PREFIX=$(yq '.tag_prefix // "release/"' "$CONFIG_FILE")
+          TARGET_BRANCH=$(yq '.deploy_branch // "production"' "$CONFIG_FILE")
 
           echo "tag_prefix=${TAG_PREFIX}" >> "$GITHUB_OUTPUT"
           echo "target_branch=${TARGET_BRANCH}" >> "$GITHUB_OUTPUT"
@@ -66,7 +66,7 @@ jobs:
           TAG_NAME="${{ github.ref_name }}"
           echo "Validating tag: ${TAG_NAME}"
 
-          # Validate tag format (e.g., uta-testing@X.Y.Z)
+          # Validate tag format (e.g., release/X.Y.Z)
           EXPECTED_PATTERN="^${TAG_PREFIX}[0-9]+\.[0-9]+\.[0-9]+$"
 
           if [[ ! "${TAG_NAME}" =~ ${EXPECTED_PATTERN} ]]; then
@@ -94,7 +94,7 @@ jobs:
       - name: Checkout Target Branch
         uses: actions/checkout@v4
         with:
-          ref: master-testing
+          ref: production
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
@@ -194,9 +194,9 @@ jobs:
 
           git add kustomize/
           git commit -m "${COMMIT_MSG}"
-          git push origin master-testing
+          git push origin production
 
-          echo "Successfully committed and pushed helm-release updates"
+          echo "Successfully committed and pushed helm-release updates to production"
 
       - name: Generate Step Summary
         env:
@@ -220,7 +220,7 @@ jobs:
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Version | ${VERSION} |" >> $GITHUB_STEP_SUMMARY
           echo "| Tag | ${TAG_NAME} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | master-testing |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | production |" >> $GITHUB_STEP_SUMMARY
           echo "| Triggered By | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Files Updated | ${FILES_UPDATED} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -237,5 +237,5 @@ jobs:
           if [[ "${DRY_RUN}" == "true" ]]; then
             echo "**Next Steps:** Run without dry_run to apply changes" >> $GITHUB_STEP_SUMMARY
           else
-            echo "**Next Steps:** FluxCD will automatically sync the updated image tags" >> $GITHUB_STEP_SUMMARY
+            echo "**Next Steps:** FluxCD will automatically sync the updated image tags from the production branch" >> $GITHUB_STEP_SUMMARY
           fi

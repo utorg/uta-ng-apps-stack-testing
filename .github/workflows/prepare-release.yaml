@@ -1,5 +1,5 @@
 # Prepare Release Workflow for UTA Config Stack
-# Creates release branch and PR from staging-testing to master-testing
+# Creates release branch and PR from staging-testing to master
 name: Prepare Release
 
 on:
@@ -22,9 +22,9 @@ concurrency:
 
 env:
   SOURCE_BRANCH: staging-testing
-  TARGET_BRANCH: master-testing
-  TAG_PREFIX: "uta-testing@"
-  BRANCH_PREFIX: "release-testing/"
+  TARGET_BRANCH: master
+  TAG_PREFIX: "release/"
+  BRANCH_PREFIX: "release/"
 
 jobs:
   prepare:
@@ -301,7 +301,7 @@ jobs:
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
           PR_HEAD_BRANCH: ${{ needs.prepare.outputs.release_branch }}
-          PR_BASE_BRANCH: master-testing
+          PR_BASE_BRANCH: master
           CHANGELOG: ${{ needs.prepare.outputs.changelog }}
           BUMP_TYPE: ${{ needs.prepare.outputs.bump_type }}
         with:
@@ -378,10 +378,10 @@ jobs:
             echo "**Dry run completed** - no changes were made." >> $GITHUB_STEP_SUMMARY
           else
             echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
-            echo "1. Review and approve the PR to master-testing" >> $GITHUB_STEP_SUMMARY
+            echo "1. Review and approve the PR to master" >> $GITHUB_STEP_SUMMARY
             echo "2. Merge PR to trigger promote-release" >> $GITHUB_STEP_SUMMARY
             echo "3. Verify release tag is created" >> $GITHUB_STEP_SUMMARY
-            echo "4. Run deploy-release to update Kustomize image references" >> $GITHUB_STEP_SUMMARY
+            echo "4. Run deploy-release to update Kustomize image references in production" >> $GITHUB_STEP_SUMMARY
           fi
 
           echo "" >> $GITHUB_STEP_SUMMARY

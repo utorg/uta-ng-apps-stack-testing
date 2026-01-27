@@ -1,12 +1,12 @@
 # Promote Release Workflow
-# Creates release tag after PR merge to master-testing
+# Creates release tag after PR merge to master
 name: Promote Release
 
 on:
   pull_request:
     types: [closed]
     branches:
-      - master-testing
+      - master
 
   workflow_dispatch:
     inputs:
@@ -25,8 +25,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TAG_PREFIX: "uta-testing@"
-  BRANCH_PREFIX: "release-testing/"
+  TAG_PREFIX: "release/"
+  BRANCH_PREFIX: "release/"
 
 jobs:
   validate:
@@ -73,7 +73,7 @@ jobs:
             HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
             echo "PR merged from branch: ${HEAD_BRANCH}"
 
-            # Extract version from branch name (release-testing/X.Y.Z)
+            # Extract version from branch name (release/X.Y.Z)
             if [[ "${HEAD_BRANCH}" =~ ^${BRANCH_PREFIX}([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
               VERSION="${BASH_REMATCH[1]}"
               echo "Extracted version: ${VERSION}"
@@ -107,7 +107,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: master-testing
+          ref: master
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
@@ -207,7 +207,7 @@ jobs:
           # Commit changelog with skip-ci
           git add "$CHANGELOG_FILE"
           git commit -m "docs: update changelog for ${VERSION} [skip ci]" || echo "No changelog changes to commit"
-          git push origin master-testing || echo "No changes to push"
+          git push origin master || echo "No changes to push"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -255,7 +255,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The release tag \`${{ needs.create-release.outputs.tag_name }}\` has been created." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "FluxCD will automatically deploy the release to production based on the tag." >> $GITHUB_STEP_SUMMARY
+          echo "Run deploy-release workflow to update Kustomize image references in production." >> $GITHUB_STEP_SUMMARY
 
   skip-summary:
     needs: [validate]
