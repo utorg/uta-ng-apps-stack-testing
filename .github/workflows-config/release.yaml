@@ -64,6 +64,10 @@ github_release:
   generate_notes: true
   prerelease: false
 
+# Deployment configuration
+deployment:
+  flux_sync_path: "kustomize/env/test-uta-stack/sync/apps-repo.yaml"
+
 # Notifications - disabled for testing
 notifications:
   slack:

@@ -1,0 +1,12 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: uta-ng-apps-stack-testing
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: https://github.com/utorg/uta-ng-apps-stack-testing
+  ref:
+    tag: release@0.0.0
+  secretRef:
+    name: github-deploy-key

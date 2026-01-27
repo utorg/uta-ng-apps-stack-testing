@@ -1,0 +1,16 @@
+# Environment Configuration for uta-ng-apps-stack-testing
+# This file defines deployment environments
+
+environments:
+  test-uta-stack:
+    name: "Test UTA Stack"
+    kustomize_path: "kustomize/env/test-uta-stack"
+    flux_sync_path: "kustomize/env/test-uta-stack/sync/apps-repo.yaml"
+    gcp_project: "zerohub-core-0"
+    cluster: "test-cluster"
+    namespace: "test-uta-apps"
+    enabled: true
+
+# Environment promotion order
+promotion_order:
+  - test-uta-stack

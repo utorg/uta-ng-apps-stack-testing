@@ -1,5 +1,5 @@
 # Deploy Release Workflow
-# Updates helm-release files with release version tags and pushes to production branch
+# Updates helm-release files and Flux GitRepository ref with release version tags
 name: Deploy Release
 
 on:
@@ -22,6 +22,7 @@ jobs:
       version: ${{ steps.validate.outputs.version }}
       tag_name: ${{ steps.validate.outputs.tag_name }}
       tag_prefix: ${{ steps.config.outputs.tag_prefix }}
+      flux_sync_path: ${{ steps.config.outputs.flux_sync_path }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -46,15 +47,18 @@ jobs:
             sudo chmod +x /usr/local/bin/yq
           fi
 
-          TAG_PREFIX=$(yq '.tag_prefix // "release/"' "$CONFIG_FILE")
+          TAG_PREFIX=$(yq '.tag_prefix // "release@"' "$CONFIG_FILE")
           TARGET_BRANCH=$(yq '.deploy_branch // "production"' "$CONFIG_FILE")
+          FLUX_SYNC_PATH=$(yq '.deployment.flux_sync_path // ""' "$CONFIG_FILE")
 
           echo "tag_prefix=${TAG_PREFIX}" >> "$GITHUB_OUTPUT"
           echo "target_branch=${TARGET_BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "flux_sync_path=${FLUX_SYNC_PATH}" >> "$GITHUB_OUTPUT"
 
           echo "Loaded config from ${CONFIG_FILE}"
           echo "  Tag prefix: ${TAG_PREFIX}"
           echo "  Target branch: ${TARGET_BRANCH}"
+          echo "  Flux sync path: ${FLUX_SYNC_PATH:-not configured}"
 
       - name: Validate Tag and Extract Version
         id: validate
@@ -66,7 +70,7 @@ jobs:
           TAG_NAME="${{ github.ref_name }}"
           echo "Validating tag: ${TAG_NAME}"
 
-          # Validate tag format (e.g., release/X.Y.Z)
+          # Validate tag format (e.g., release@X.Y.Z)
           EXPECTED_PATTERN="^${TAG_PREFIX}[0-9]+\.[0-9]+\.[0-9]+$"
 
           if [[ ! "${TAG_NAME}" =~ ${EXPECTED_PATTERN} ]]; then
@@ -84,14 +88,17 @@ jobs:
           echo "Tag validated: ${TAG_NAME}"
           echo "Version extracted: ${VERSION}"
 
-  update-helm-releases:
+  update-flux-config:
     needs: [validate-version]
+    if: needs.validate-version.outputs.flux_sync_path != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
+    outputs:
+      flux_updated: ${{ steps.update-flux.outputs.updated }}
     steps:
-      - name: Checkout Target Branch
+      - name: Checkout Production Branch
         uses: actions/checkout@v4
         with:
           ref: production
@@ -110,14 +117,110 @@ jobs:
           set -euo pipefail
 
           echo "Verifying tag exists: ${TAG_NAME}"
-
-          # Fetch all tags
           git fetch --tags
 
-          # Check if tag exists
           if ! git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
             echo "::error::Tag ${TAG_NAME} does not exist in the repository"
-            echo "::error::Please ensure the release PR has been merged and the promote-release workflow has completed"
+            exit 1
+          fi
+
+          echo "Tag ${TAG_NAME} exists"
+
+      - name: Update Flux GitRepository Tag
+        id: update-flux
+        env:
+          VERSION: ${{ needs.validate-version.outputs.version }}
+          TAG_NAME: ${{ needs.validate-version.outputs.tag_name }}
+          FLUX_SYNC_PATH: ${{ needs.validate-version.outputs.flux_sync_path }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          FILE_PATH="${FLUX_SYNC_PATH}"
+          echo "Updating ${FILE_PATH} with tag: ${TAG_NAME}"
+
+          if [[ ! -f "${FILE_PATH}" ]]; then
+            echo "::error::File not found: ${FILE_PATH}"
+            exit 1
+          fi
+
+          if ! grep -q "tag:" "${FILE_PATH}"; then
+            echo "::error::File ${FILE_PATH} does not contain expected 'tag:' pattern"
+            exit 1
+          fi
+
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            echo "DRY RUN: Would update ${FILE_PATH} with tag: ${TAG_NAME}"
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          cp "${FILE_PATH}" "${FILE_PATH}.backup"
+
+          # Update tag using sed - handle both formats
+          sed -i "s|tag: release@.*|tag: ${TAG_NAME}|g" "${FILE_PATH}"
+          sed -i "s|tag: \"release@.*\"|tag: \"${TAG_NAME}\"|g" "${FILE_PATH}"
+
+          if ! grep -q "${TAG_NAME}" "${FILE_PATH}"; then
+            echo "::error::Failed to update tag in ${FILE_PATH}"
+            mv "${FILE_PATH}.backup" "${FILE_PATH}"
+            exit 1
+          fi
+
+          echo "Changes made:"
+          git diff "${FILE_PATH}"
+
+          COMMIT_MSG="chore: update Flux GitRepository ref to ${TAG_NAME}"
+
+          git add "${FILE_PATH}"
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit (tag already up to date)"
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "${COMMIT_MSG}"
+            git push origin production
+            echo "Successfully updated Flux GitRepository ref"
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          rm -f "${FILE_PATH}.backup"
+
+  update-helm-releases:
+    needs: [validate-version, update-flux-config]
+    if: always() && needs.validate-version.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout Target Branch
+        uses: actions/checkout@v4
+        with:
+          ref: production
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Pull Latest Changes
+        run: |
+          git pull origin production --rebase || true
+
+      - name: Verify Release Tag Exists
+        env:
+          TAG_NAME: ${{ needs.validate-version.outputs.tag_name }}
+        run: |
+          set -euo pipefail
+
+          echo "Verifying tag exists: ${TAG_NAME}"
+          git fetch --tags
+
+          if ! git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG_NAME} does not exist in the repository"
             exit 1
           fi
 
@@ -134,7 +237,6 @@ jobs:
 
           echo "Searching for helm-release.yaml files..."
 
-          # Find all helm-release files in kustomize directories
           HELM_FILES=$(find kustomize -name "helm-release.yaml" -type f 2>/dev/null || true)
 
           if [[ -z "$HELM_FILES" ]]; then
@@ -151,17 +253,13 @@ jobs:
               continue
             fi
 
-            # Check if file contains image tag pattern
             if grep -q 'tag:.*imagepolicy' "$file" 2>/dev/null; then
               echo "Found file with image policy: $file"
 
               if [[ "${DRY_RUN}" == "true" ]]; then
                 echo "  DRY RUN: Would update tag to ${VERSION}"
-                # Show what would change
                 grep -n 'tag:.*imagepolicy' "$file" || true
               else
-                # Update image tags - preserve the imagepolicy comment
-                # Pattern: tag: "X.Y.Z" # {"$imagepolicy": "..."}
                 sed -i -E "s/(tag: \")[^\"]+(\".*)(\{\"\\\$imagepolicy\")/\1${VERSION}\2\3/g" "$file"
 
                 if git diff --quiet "$file"; then
@@ -205,6 +303,8 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           FILES_UPDATED: ${{ steps.update.outputs.files_updated }}
           FILES_LIST: ${{ steps.update.outputs.files_list }}
+          FLUX_SYNC_PATH: ${{ needs.validate-version.outputs.flux_sync_path }}
+          FLUX_UPDATED: ${{ needs.update-flux-config.outputs.flux_updated }}
         run: |
           echo "## Deploy Release Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -222,11 +322,17 @@ jobs:
           echo "| Tag | ${TAG_NAME} |" >> $GITHUB_STEP_SUMMARY
           echo "| Branch | production |" >> $GITHUB_STEP_SUMMARY
           echo "| Triggered By | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Files Updated | ${FILES_UPDATED} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Helm Files Updated | ${FILES_UPDATED} |" >> $GITHUB_STEP_SUMMARY
+
+          if [[ -n "${FLUX_SYNC_PATH}" ]]; then
+            echo "| Flux Sync Path | ${FLUX_SYNC_PATH} |" >> $GITHUB_STEP_SUMMARY
+            echo "| Flux GitRepository Updated | ${FLUX_UPDATED:-skipped} |" >> $GITHUB_STEP_SUMMARY
+          fi
+
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [[ -n "${FILES_LIST}" ]]; then
-            echo "### Updated Files" >> $GITHUB_STEP_SUMMARY
+            echo "### Updated Helm Release Files" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo -e "${FILES_LIST}" >> $GITHUB_STEP_SUMMARY
@@ -237,5 +343,5 @@ jobs:
           if [[ "${DRY_RUN}" == "true" ]]; then
             echo "**Next Steps:** Run without dry_run to apply changes" >> $GITHUB_STEP_SUMMARY
           else
-            echo "**Next Steps:** FluxCD will automatically sync the updated image tags from the production branch" >> $GITHUB_STEP_SUMMARY
+            echo "**Next Steps:** FluxCD will automatically sync the updated configuration from the production branch" >> $GITHUB_STEP_SUMMARY
           fi
