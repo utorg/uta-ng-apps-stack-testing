@@ -1,5 +1,5 @@
 # Promote Release Workflow
-# Creates release tag after PR merge to master-testing
+# Creates release tag after PR merge to target branch
 name: Promote Release
 
 on:
@@ -73,7 +73,7 @@ jobs:
             HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
             echo "PR merged from branch: ${HEAD_BRANCH}"
 
-            # Extract version from branch name (release-testing/X.Y.Z)
+            # Extract version from branch name (release/X.Y.Z)
             if [[ "${HEAD_BRANCH}" =~ ^${BRANCH_PREFIX}([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
               VERSION="${BASH_REMATCH[1]}"
               echo "Extracted version: ${VERSION}"
@@ -162,6 +162,8 @@ jobs:
       - name: Update Changelog
         env:
           VERSION: ${{ needs.validate.outputs.version }}
+          PR_BODY: ${{ github.event_name == 'pull_request' && steps.pr.outputs.body || 'Manual release' }}
+          PR_NUM: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'N/A' }}
         run: |
           set -euo pipefail
 
@@ -175,15 +177,6 @@ jobs:
 
           # Prepare release entry
           RELEASE_DATE=$(date -u +"%Y-%m-%d")
-
-          # Get PR body if available
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            PR_BODY='${{ steps.pr.outputs.body }}'
-            PR_NUM="${{ github.event.pull_request.number }}"
-          else
-            PR_BODY="Manual release"
-            PR_NUM="N/A"
-          fi
 
           # Insert new release at top (after header)
           {
@@ -255,7 +248,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The release tag \`${{ needs.create-release.outputs.tag_name }}\` has been created." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "FluxCD will automatically deploy the release to production based on the tag." >> $GITHUB_STEP_SUMMARY
+          echo "Run deploy-release workflow to update Kustomize image references in production." >> $GITHUB_STEP_SUMMARY
 
   skip-summary:
     needs: [validate]

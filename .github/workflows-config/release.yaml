@@ -1,8 +1,8 @@
-# Release Configuration for UTA Testing
-# This file defines release workflow settings for the uta-testing project
+# Release Configuration for UTA Config Stack
+# This file defines release workflow settings
 
 # Project identification
-project: uta-testing
+project: uta-ng-apps-stack-testing
 
 # Top-level configuration (required by spec)
 tag_prefix: "uta-testing@"
@@ -16,9 +16,9 @@ versioning:
   tag_prefix: "uta-testing@"
   pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
 
-# Changelog generation
+# Changelog generation - disabled for testing repository
 changelog:
-  generate: false  # Disabled for testing
+  generate: false
   template: keepachangelog
   commit_types:
     feat: Features
@@ -60,9 +60,13 @@ pull_request:
 
 # GitHub Release configuration
 github_release:
-  enabled: false  # Disabled for testing
+  enabled: true
   generate_notes: true
   prerelease: false
+
+# Deployment configuration
+deployment:
+  flux_sync_path: "kustomize/env/test-uta-stack/sync/apps-repo.yaml"
 
 # Notifications - disabled for testing
 notifications:
