@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: OPTIMISM
       image:
         name: "blockchain-connector"
-        tag: "0.4.0" # {"$imagepolicy": "apps:blockchain-connector-optimism-image-policy:tag"}
+        tag: "0.5.1" # {"$imagepolicy": "apps:blockchain-connector-optimism-image-policy:tag"}

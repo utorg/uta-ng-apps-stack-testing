@@ -25,7 +25,7 @@ spec:
       strategy:
         type: Recreate
       image:
-        tag: "0.4.0" # {"$imagepolicy": "apps:identity-manager-image-policy:tag"}
+        tag: "0.5.1" # {"$imagepolicy": "apps:identity-manager-image-policy:tag"}
       resources:
         limits:
           cpu: "500m"
