@@ -157,9 +157,8 @@ jobs:
 
           cp "${FILE_PATH}" "${FILE_PATH}.backup"
 
-          # Update tag using sed - handle both formats
-          sed -i "s|tag: release@.*|tag: ${TAG_NAME}|g" "${FILE_PATH}"
-          sed -i "s|tag: \"release@.*\"|tag: \"${TAG_NAME}\"|g" "${FILE_PATH}"
+          # Update tag using sed - match any existing tag value
+          sed -i "s|^\(\s*tag:\s*\).*|\1${TAG_NAME}|g" "${FILE_PATH}"
 
           if ! grep -q "${TAG_NAME}" "${FILE_PATH}"; then
             echo "::error::Failed to update tag in ${FILE_PATH}"
