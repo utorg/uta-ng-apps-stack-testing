@@ -30,7 +30,7 @@ spec:
         PROFILER_GCLOUD_ZONE: europe-west4-a
         NODE_OPTIONS: "--max-old-space-size=3200"
       image:
-        tag: "0.5.1" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:tag"}
+        tag: "0.6.0" # {"$imagepolicy": "apps:blockchain-parser-solana-image-policy:tag"}
       resources:
         requests:
           cpu: 10m

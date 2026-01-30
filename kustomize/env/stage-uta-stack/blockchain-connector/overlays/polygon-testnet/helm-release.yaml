@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: POLYGON_TESTNET
       image:
         name: "blockchain-connector"
-        tag: "0.5.1" # {"$imagepolicy": "apps:blockchain-connector-testnet-image-policy:tag"}
+        tag: "0.6.0" # {"$imagepolicy": "apps:blockchain-connector-testnet-image-policy:tag"}
