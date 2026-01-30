@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: LITECOIN
       image:
         name: "blockchain-connector"
-        tag: "0.6.0" # {"$imagepolicy": "apps:blockchain-connector-litecoin-image-policy:tag"}
+        tag: "0.7.0" # {"$imagepolicy": "apps:blockchain-connector-litecoin-image-policy:tag"}

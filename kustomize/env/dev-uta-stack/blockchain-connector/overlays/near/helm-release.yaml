@@ -10,4 +10,4 @@ spec:
         INSTANCE_CHAINS: NEAR
       image:
         name: "blockchain-connector"
-        tag: "0.6.0" # {"$imagepolicy": "apps:blockchain-connector-near-image-policy:tag"}
+        tag: "0.7.0" # {"$imagepolicy": "apps:blockchain-connector-near-image-policy:tag"}

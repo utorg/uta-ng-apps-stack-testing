@@ -37,7 +37,7 @@ spec:
         IS_ACTIVITY_MODULE_ENABLED: "true"
         RECEIVER_DISABLED_FORCE: "true" # special flag for stage environment (do not use for prod)
       image:
-        tag: "0.6.0" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
+        tag: "0.7.0" # {"$imagepolicy": "apps:blockchain-connector-image-policy:tag"}
       strategy:
         type: Recreate
       resources:
