@@ -7,7 +7,7 @@ environment: develop
 docker:
   enabled: false
   push: false
-  repository: github-testing-dev-cr
+  repository: github-testing-dev-cr-v2
 
 # Maven Repository Configuration (Development)
 maven:
@@ -22,9 +22,9 @@ npm:
     - scope: "@ut"
       project_id: zerohub-core-0
       region: europe-west4
-      repository: github-testing-dev-npm
+      repository: github-testing-dev-npm-v2
     # @ut-libs packages are shared dependencies - pull from shared registry
     - scope: "@ut-libs"
       project_id: zerohub-core-0
       region: europe-west4
-      repository: github-testing-npm
+      repository: github-testing-npm-v2

@@ -7,7 +7,7 @@ environment: staging
 docker:
   enabled: false
   push: false
-  repository: github-testing-stage-cr
+  repository: github-testing-stage-cr-v2
 
 # Maven Repository Configuration (Staging)
 maven:
@@ -22,9 +22,9 @@ npm:
     - scope: "@ut"
       project_id: zerohub-core-0
       region: europe-west4
-      repository: github-testing-stage-npm
+      repository: github-testing-stage-npm-v2
     # @ut-libs packages are shared dependencies - pull from shared registry
     - scope: "@ut-libs"
       project_id: zerohub-core-0
       region: europe-west4
-      repository: github-testing-npm
+      repository: github-testing-npm-v2
