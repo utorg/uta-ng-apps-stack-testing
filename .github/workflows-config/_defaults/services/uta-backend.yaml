@@ -4,6 +4,7 @@
 service_id: uta-backend-testing
 type: nestjs
 enabled: true
+release_branch_prefix: "release-testing/"
 
 build:
   timeout_minutes: 20
