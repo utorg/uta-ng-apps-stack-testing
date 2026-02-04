@@ -17,7 +17,6 @@ maven:
 
 # NPM Registry Configuration (Development)
 npm:
-  scope: "@ut"
   registries:
     - scope: "@ut"
       project_id: zerohub-core-0
