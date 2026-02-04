@@ -1,7 +1,0 @@
-# ut-libs-testing library configuration
-# UTA shared libraries monorepo - testing repository
-
-build:
-  gradle_args: ""
-
-# Inherits all defaults from _defaults.yaml

@@ -25,27 +25,3 @@ gcp:
 # Maven Repository Configuration
 # Registry URLs are specified in environment-specific configs (envs/*/)
 maven: {}
-
-# Runner configuration
-runs_on: ubuntu-latest
-
-# Permissions
-permissions:
-  contents: read
-  id-token: write
-
-# Feature flags
-features:
-  security_scan: false
-
-# Caching
-cache:
-  enabled: true
-
-# Version bump - disabled for testing
-version_bump:
-  enabled: false
-
-# Cascade configuration - deferred to separate proposal
-cascade:
-  enabled: false

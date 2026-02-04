@@ -1,12 +1,9 @@
 # Staging Environment Defaults - UTA Testing
 # Environment-specific overrides for staging branches
 
-environment: staging
-
 # Docker publishing
 docker:
   enabled: false
-  push: false
   repository: github-testing-stage-cr-v2
 
 # Maven Repository Configuration (Staging)

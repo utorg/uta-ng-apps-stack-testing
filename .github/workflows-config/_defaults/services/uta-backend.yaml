@@ -21,18 +21,11 @@ docker:
   build_args:
     modules: "node:20-alpine"
 
-# NPM registry for @ut-libs packages
-# NOTE: npm.registries is set in environment-specific configs (envs/*/_defaults.yaml)
-npm:
-  registries: []
-
 # Monorepo Configuration
 # uta-backend is a NestJS monorepo with apps/ directory structure
 monorepo:
   enabled: true
-  npm: false  # Disable npm plugin - service uses Docker images, not npm packages
   apps_path: "apps"
-  libs_path: "libs"
   # List of apps that can be built (must match actual directory names in test repo)
   # Note: uta-backend-testing has different app names than production
   buildable_apps:
@@ -44,28 +37,3 @@ monorepo:
     - playground
     - stories
     - documentation
-
-# Feature flags
-features:
-  dependency_submission: false
-  auto_deploy: false
-
-# Required secrets (reference only)
-secrets:
-  - GCP_PROJECT_ID
-  - GLOBAL_GCP_SERVICE_ACCOUNT
-  - GLOBAL_GCP_WORKLOAD_IDENTITY_PROVIDER
-
-# Version bump configuration per environment
-# - Enabled only for master (prod) to test full release flow
-# - Disabled for develop/staging to avoid noise
-environments:
-  develop:
-    version_bump:
-      enabled: false
-  staging:
-    version_bump:
-      enabled: false
-  master:
-    version_bump:
-      enabled: true

@@ -1,12 +1,9 @@
 # Development Environment Defaults - UTA Testing
 # Environment-specific overrides for develop branches
 
-environment: develop
-
 # Docker publishing
 docker:
   enabled: false
-  push: false
   repository: github-testing-dev-cr-v2
 
 # Maven Repository Configuration (Development)

@@ -2,17 +2,6 @@
 # This file defines project-level defaults for all UTA testing services
 # Testing mode: No artifacts published, tests only
 
-# Project identification
-project_id: uta-testing
-display_name: UTA Testing
-branch_suffix: "-testing"
-
-# Branch mappings
-branches:
-  develop: develop-testing
-  staging: staging-testing
-  master: master-testing
-
 # Git tag prefix for versioning
 git_tag_prefix: "uta-testing@"
 
@@ -45,44 +34,3 @@ npm:
 build:
   timeout_minutes: 20
   skip_tests: false
-
-# Concurrency settings
-concurrency:
-  cancel_in_progress: true
-
-# Runner configuration
-runs_on: ubuntu-latest
-
-# Permissions
-permissions:
-  contents: read
-  id-token: write
-
-# Feature flags - disabled for testing
-features:
-  dependency_submission: false
-  auto_deploy: false
-  security_scan: false
-
-# Version bump - always disabled for testing
-version_bump:
-  enabled: false
-
-# Artifact retention
-artifacts:
-  retention_days: 3
-
-# Caching
-cache:
-  enabled: true
-
-# Release configuration - disabled for testing
-release:
-  auto_changelog: false
-  version_file: version.json
-
-# Notifications - disabled for testing
-notifications:
-  slack_channel: ""
-  on_failure: false
-  on_release: false

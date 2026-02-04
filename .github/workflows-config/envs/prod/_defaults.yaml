@@ -1,12 +1,9 @@
 # Production Environment Defaults - UTA Testing
 # Environment-specific overrides for master branches
 
-environment: production
-
 # Docker publishing
 docker:
   enabled: false
-  push: false
   repository: github-testing-prod-cr-v2
 
 # Maven Repository Configuration (Production)
